@@ -1,0 +1,7 @@
+Hello from example.com!
+
+Please confirm your email by clicking the link below:
+
+http://localhost:8000/dj-rest-auth/confirm-email/{{ key }}
+
+Thank you!

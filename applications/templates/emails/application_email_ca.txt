@@ -1,0 +1,5 @@
+Hi {{ candidate }},
+    You have successfully applied to the job ({{ title }}).
+    Stay Tuned for further Updates!
+From,
+    CarriersHai

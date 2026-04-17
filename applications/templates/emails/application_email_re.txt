@@ -1,0 +1,4 @@
+Hi {{ recruiter }},
+    You Got a new Application on the job ({{ title }}) from {{ candidate }}
+From,
+    CarriersHai

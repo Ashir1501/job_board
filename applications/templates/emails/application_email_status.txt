@@ -1,0 +1,21 @@
+<Application for {{ title }}
+{% if status == "REJ" %}
+Hi {{ candidate }},
+    Thank you for your interest in the {{ title }}
+    and for taking the time to apply with us.
+
+    We have decided to move forward with another candidate.
+    We wish you the best of luck in your job search and future professional endeavors.
+From,
+    CarrierHai
+{% endif %}
+
+{% if status == "SHL" %}
+    Hi {{ candidate }},
+        Thank you for your interest in the {{ title }}
+
+        We have decided to move forward with your application.
+        We wish you the best of luck in your role and stay tuned for future updates.
+    From,
+        CarrierHai
+{% endif %}

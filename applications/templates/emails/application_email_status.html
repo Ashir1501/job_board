@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application</title>
+</head>
+<body>
+    <h1>Application for {{ title }}</h1>
+    {% if status == "REJ" %}
+    <p>
+    Hi {{ candidate }},
+        Thank you for your interest in the {{ title }}
+        and for taking the time to apply with us.
+
+        We have decided to move forward with another candidate.
+        We wish you the best of luck in your job search and future professional endeavors.
+    From,
+        CarrierHai
+    </p>
+    {% endif %}
+    
+    {% if status == "SHL" %}
+    <p>
+        Hi {{ candidate }},
+            Thank you for your interest in the {{ title }}
+    
+            We have decided to move forward with your application.
+            We wish you the best of luck in your role and stay tuned for future updates.
+        From,
+            CarrierHai
+    </p>
+    {% endif %}
+</body>
+</html>
