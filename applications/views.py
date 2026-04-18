@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import mixins, permissions, viewsets
-from .service import application_status_mailer, new_application_mailer
+from .tasks import application_status_mailer_task, new_application_mailer_task
 from .serializers import ApplicationSerializer, ApplicationStatusSerializer
 from accounts.permissions import IsCandidate, IsRecruiter
 from accounts.models import User
@@ -55,7 +55,10 @@ class ApplicationViewSet(CreateUpdateListViewSet):
     def perform_create(self, serializer):
         try:
             instance = serializer.save(user=self.request.user)
-            transaction.on_commit(partial(new_application_mailer, instance.pk))
+            # transaction.on_commit(partial(new_application_mailer_task, instance.pk))
+            transaction.on_commit(
+                lambda: new_application_mailer_task.delay(instance.pk) #sends task to celary
+            ) 
         except IntegrityError:
             raise ValidationError('You have already applied to this job.')
 
@@ -64,4 +67,7 @@ class ApplicationViewSet(CreateUpdateListViewSet):
         instance = serializer.save(updated_by=self.request.user)
     
         if instance.status in [Application.SHORTLISTED, Application.REJECTED]:
-            transaction.on_commit(partial(application_status_mailer, instance.pk))
+            # transaction.on_commit(partial(application_status_mailer_task, instance.pk))
+            transaction.on_commit(
+                lambda: application_status_mailer_task.delay(instance.pk) #sends task to celary
+            )

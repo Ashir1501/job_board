@@ -54,8 +54,8 @@ class WorkExperience(models.Model):
     FREELANCE = 'FRLN'
     CONTRACTUAL = 'CONT'
     work_type_choice = (
-        (FULL_TIME, 'Full_time'),
-        (PART_TIME, 'Part_time'),
+        (FULL_TIME, 'Full time'),
+        (PART_TIME, 'Part time'),
         (INTERNSHIP, 'Internship'),
         (FREELANCE, 'Freelance'),
         (CONTRACTUAL, 'Contractual'),

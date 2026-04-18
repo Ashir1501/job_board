@@ -112,10 +112,20 @@ WSGI_APPLICATION = 'job_board.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -223,3 +233,11 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_PORT = env('EMAIL_PORT')
 SITE_ID = 1
+
+CELERY_BROKER_URL = env('CELERY_BROKER_URL') # redis url
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND') # to access result from tasks
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_ALWAYS_EAGER = False # Task execution behavior async - normal
+CELERY_TASK_ACKS_LATE = True #Retry behavior
+CELERY_ACCEPT_CONTENT = ['json'] # celary sends data over network 
+CELERY_TASK_SERIALIZER = 'json'  # so serializing it 
