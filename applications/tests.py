@@ -1,6 +1,6 @@
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from accounts.models import User
 from jobs.models import Job, Location
@@ -11,15 +11,18 @@ from allauth.account.admin import EmailAddress
 
 
 class ApplicationTestSetUp(APITestCase):
-    def setUp(self):
-        self.candidate = User.objects.create_user(
+
+    @classmethod
+    def setUpTestData(cls):
+        
+        cls.candidate = User.objects.create_user(
             username='leon',
             email='leon@mail.com',
             role=User.CANDIDATE,
             password = 'password@123'
         )
         
-        self.recruiter = User.objects.create_user(
+        cls.recruiter = User.objects.create_user(
             username='baron',
             email='baron@mail.com',
             role=User.RECRUITER,
@@ -31,19 +34,24 @@ class ApplicationTestSetUp(APITestCase):
             b"dummy content",
             content_type="application/pdf"
         )
-        CandidateProfile.objects.create(
-            user = self.candidate,
+        cls.profile = CandidateProfile.objects.create(
+            user = cls.candidate,
             resume = resume_file
         )
     
-    def force_email_verify(self,user):
-        email = EmailAddress.objects.create(
-            user_id=user.pk,
-            email=user.email,
+        email_candidate = EmailAddress.objects.create(
+            user_id=cls.candidate.pk,
+            email=cls.candidate.email,
             primary=True,
             verified=True
         )
-        email.save()
+
+        email_recruiter = EmailAddress.objects.create(
+            user_id=cls.recruiter.pk,
+            email=cls.recruiter.email,
+            primary=True,
+            verified=True
+        )
 
     def status_transition_invalid_request(self,url,app_status):
         data = {
@@ -61,12 +69,13 @@ class ApplicationTestSetUp(APITestCase):
 
     def authenticate_user(self,user):
         self.client.force_authenticate(user=user)
-        self.force_email_verify(user)
 
 
 class ApplicationTests(ApplicationTestSetUp):
-    def setUp(self):
-        super().setUp()
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         data = {
             'title': 'Python Developer',
@@ -76,19 +85,19 @@ class ApplicationTests(ApplicationTestSetUp):
             'salary_max': 20000,
             'experience_min': 0,
             'experience_max':1,
-            'created_by': self.recruiter
+            'created_by': cls.recruiter
         }
-        self.job = Job.objects.create(**data)
+        cls.job = Job.objects.create(**data)
         l1 = Location.objects.create(city='New York', country='USA')
         l2 = Location.objects.create(city='starbase', country='USA')
-        self.job.locations.set([l1,l2])
+        cls.job.locations.set([l1,l2])
     
     def test_create_application_without_resume(self):
         '''
         Ensure candidate cannot apply without resume
         '''
-        self.authenticate_user(self.candidate)
-        profile = CandidateProfile.objects.get(user=self.candidate)
+        self.client.force_authenticate(user=self.candidate)
+        profile = CandidateProfile.objects.get(pk=self.profile.pk)
         profile.resume = None
         profile.save()
         url = reverse('application-list')
@@ -104,7 +113,7 @@ class ApplicationTests(ApplicationTestSetUp):
         """
         Ensure candidate can apply with resume
         """
-        self.authenticate_user(self.candidate)
+        self.client.force_authenticate(user=self.candidate)
 
         url = reverse('application-list')
         data = {
@@ -118,7 +127,7 @@ class ApplicationTests(ApplicationTestSetUp):
         Ensure candidate can apply with resume
         """
         self.client.force_authenticate(user=self.candidate)
-
+        EmailAddress.objects.filter(user=self.candidate).delete()
         url = reverse('application-list')
         data = {
             'job': self.job.pk,
@@ -130,7 +139,7 @@ class ApplicationTests(ApplicationTestSetUp):
         """
         Ensure recruiter cannot apply
         """
-        self.authenticate_user(self.recruiter)
+        self.client.force_authenticate(user=self.recruiter)
 
         url = reverse('application-list')
         data = {
@@ -144,7 +153,7 @@ class ApplicationTests(ApplicationTestSetUp):
         Ensure application unique check working
         """
 
-        self.authenticate_user(self.candidate)
+        self.client.force_authenticate(user=self.candidate)
 
         url = reverse('application-list')
         data = {
@@ -158,7 +167,7 @@ class ApplicationTests(ApplicationTestSetUp):
         """
         Ensure candidate cannot update application
         """
-        self.authenticate_user(self.candidate)
+        self.client.force_authenticate(user=self.candidate)
 
         application = Application.objects.create(
             user = self.candidate,
@@ -177,7 +186,7 @@ class ApplicationTests(ApplicationTestSetUp):
         Ensure recruiter can update an application
         """
 
-        self.authenticate_user(self.recruiter)
+        self.client.force_authenticate(user=self.recruiter)
 
         application = Application.objects.create(user=self.candidate,job=self.job)
         url = reverse('application-detail', kwargs={'pk':application.id})
@@ -191,7 +200,7 @@ class ApplicationTests(ApplicationTestSetUp):
         """
         Ensure application transition from rejected is validated
         """
-        self.authenticate_user(self.recruiter)
+        self.client.force_authenticate(user=self.recruiter)
 
         application = Application.objects.create(
             user=self.candidate,
@@ -209,7 +218,7 @@ class ApplicationTests(ApplicationTestSetUp):
         """
         Ensure application transition from shortlisted is validated
         """
-        self.authenticate_user(self.recruiter)
+        self.client.force_authenticate(user=self.recruiter)
 
         application = Application.objects.create(
             user=self.candidate,
@@ -227,7 +236,7 @@ class ApplicationTests(ApplicationTestSetUp):
         """
         Ensure application transition from pending is validated
         """
-        self.authenticate_user(self.recruiter)
+        self.client.force_authenticate(user=self.recruiter)
 
         application = Application.objects.create(
             user=self.candidate,
@@ -244,7 +253,7 @@ class ApplicationTests(ApplicationTestSetUp):
         """
         Ensure application transition from viewed is validated
         """
-        self.authenticate_user(self.recruiter)
+        self.client.force_authenticate(user=self.recruiter)
 
         application = Application.objects.create(
             user=self.candidate,

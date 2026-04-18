@@ -7,46 +7,50 @@ from rest_framework import status
 # Create your tests here.
 
 class JobTestSetUp(APITestCase):
-    def setUp(self):
-        self.candidate = User.objects.create_user(
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.candidate = User.objects.create_user(
             username='leon',
             email='leon@mail.com',
             role=User.CANDIDATE,
             password = 'password@123'
         )
         
-        self.recruiter = User.objects.create_user(
+        cls.recruiter = User.objects.create_user(
             username='baron',
             email='baron@mail.com',
             role=User.RECRUITER,
             password = 'password@123'
         )
 
-        self.recruiter_2 = User.objects.create_user(
+        cls.recruiter_2 = User.objects.create_user(
             username='shawn',
             email='shawn@mail.com',
             role=User.RECRUITER,
             password='password@123'
         )
-    
-    def force_email_verify(self,user):
-        email = EmailAddress.objects.create(
-            user_id=user.pk,
-            email=user.email,
+        
+        EmailAddress.objects.create(
+            user_id=cls.candidate.pk,
+            email=cls.candidate.email,
             primary=True,
             verified=True
         )
-        email.save()
-
-    def authenticate_user(self,user):
-        self.client.force_authenticate(user=user)
-        self.force_email_verify(user)
-
-
+        EmailAddress.objects.create(
+            user_id=cls.recruiter.pk,
+            email=cls.recruiter.email,
+            primary=True,
+            verified=True
+        )
+        EmailAddress.objects.create(
+            user_id=cls.recruiter_2.pk,
+            email=cls.recruiter_2.email,
+            primary=True,
+            verified=True
+        )
 
 class JobTests(JobTestSetUp):
-    def setUp(self):
-        return super().setUp()
         
     def test_create_job_recruiter(self):
         """
@@ -55,9 +59,8 @@ class JobTests(JobTestSetUp):
         # access_token = self.login_user(self.recruiter)
         # self.client.cookies['access'] = access_token
         self.client.force_authenticate(user=self.recruiter)
-
-        # creating job without verifying email
         url = reverse('job-list')
+
         data = {
             'title': 'Python Developer',
             'job_type': 'FULL',
@@ -78,12 +81,7 @@ class JobTests(JobTestSetUp):
             'experience_max':1
         }
         
-        response = self.client.post(url,data,format='json')
-        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data.get('non_field_errors')[0].code , 'invalid')
-
-        # creating job after verifying email
-        self.force_email_verify(self.recruiter)
+        # creating job with verified email
         response = self.client.post(url,data,format='json')
         response_data = {
             'title': response.data.get('title'),
@@ -106,12 +104,20 @@ class JobTests(JobTestSetUp):
             'experience_max':1,
             'is_active': True
         })
+
+        # creating job without verifying email
+        EmailAddress.objects.filter(user=self.recruiter).delete()
+        
+        response = self.client.post(url,data,format='json')
+        self.assertEqual(response.status_code,status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data.get('non_field_errors')[0].code , 'invalid')
+
     
     def test_create_job_candidate(self):
         """
         Ensure job cannot be created by candidate
         """
-        self.authenticate_user(self.candidate)
+        self.client.force_authenticate(user=self.candidate)
 
         url = reverse('job-list')
         data = {
@@ -144,7 +150,7 @@ class JobTests(JobTestSetUp):
         """
         Ensure validation process working
         """
-        self.authenticate_user(self.recruiter)
+        self.client.force_authenticate(user=self.recruiter)
 
         url = reverse('job-list')
 
@@ -249,7 +255,7 @@ class JobTests(JobTestSetUp):
         l2= Location.objects.create(city='Bengaluru', country='India')
         job.locations.set([l1,l2])
 
-        self.authenticate_user(self.recruiter_2)
+        self.client.force_authenticate(user=self.recruiter_2)
 
         # another recruiter attempting to update job created by another recruiter
         # attempt fails since recruiter can access only his job
@@ -265,7 +271,7 @@ class JobTests(JobTestSetUp):
         self.assertEqual(error.code,'not_found')
 
         # recruiter attempting to update his own job
-        self.authenticate_user(self.recruiter)
+        self.client.force_authenticate(user=self.recruiter)
 
         url = reverse('job-detail', kwargs={'pk': job.id})
         data = {
