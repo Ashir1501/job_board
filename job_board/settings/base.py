@@ -227,7 +227,7 @@ ACCOUNT_SIGNUP_FIELDS = ['email*']
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-
+ACCOUNT_ADAPTER = 'accounts.adapters.MyAccountAdapter'
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = env('EMAIL_HOST')
