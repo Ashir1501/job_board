@@ -1,0 +1,192 @@
+{% extends './base.html' %}
+{% load static %}
+
+{% block title %}
+<title>CareerZ: profile</title>
+{% endblock %}
+
+{% block main %}
+<main class="flex-1 max-w-7xl mx-auto w-full px-6 py-6">
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Profile -->
+        <section class="bg-white p-6 rounded-xl shadow" id="profile-Box">
+            <h2 class="font-semibold mb-3">Profile</h2>
+            <p><span class="inline-block w-1/5 text-left">Email:</span> <span id="email"
+                    class="inline-block w-1/5 text-left" data-email="{{ email }}">{{ email }}</span></p>
+            <p><span class="inline-block w-1/5 text-left">Username:</span> <span id="username"
+                    class="inline-block w-1/5 text-left">{{ username }}</span></p>
+            <p>
+                {% if is_verified %}
+                <span class="inline text-green-600 font-semibold align-middle">Verified:</span> <span id="verified"
+                    class="inline" id="verified"><img class="inline h-10" src="{% static 'image/verified.png' %}"
+                        alt="verified-image"></span>
+                {% else %}
+                <span class="inline text-red-600 align-middle">Verified:</span> <span id="verified" class="inline"
+                    id="not-verified"><img class="inline h-10" src="{% static 'image/not_verified.png' %}"
+                        alt="not-verified-image"></span>
+                {% endif %}
+            </p>
+            <p>
+                {% if is_verified is False %}
+                <a id="verify-link" class="underline text-blue-500" href="#">Click on this link to verify your Email</a>
+                {% endif %}
+            </p>
+        </section>
+
+        <!-- Summary -->
+        <section class="bg-white p-6 rounded-xl shadow">
+            <h2 class="inline-block align-baseline font-semibold mb-3 mr-3">Summary</h2><img id="edit-summary-section"
+                class="inline-block h-8 align-middle" src="{% static 'image/edit.png' %}" alt="edit_image">
+            <p id="summary" data-original="{{ summary }}" class="" contenteditable="false">{{ summary }}</p>
+
+            <p id="resume-block" class="mt-3">
+                <span class="inline-block mr-4">Resume: </span><span id="resume-name"
+                    data-resume-name="{{ resume_name }}" class="inline-block mr-4">{{ resume_name }}</span><a
+                    id="resume-url" data-resume-url="{{ resume_url }}" class="inline" href="{{ resume_url }}"
+                    download><img id="pdf-download-img" class="inline h-8" src="{% static 'image/download_pdf.png' %}"
+                        alt=""></a>
+            </p>
+
+            <div id="skill-block" class="mt-3">
+                <span>Skills:</span>
+                <div id="skills" class="flex gap-2 flex-wrap relative">
+                    {% for id, skill in skill_list %}
+                    <div id="summary-skill-{{ id }}" class="bg-blue-100 px-2 mx-2 relative">{{ skill }}
+                        <img id="summary-minus-{{ id }}" data-for-skill="summary-skill-{{ id }}"
+                            class="absolute h-4 -top-2 -right-1 hidden" src="{% static 'image/minus.png' %}"
+                            alt="minus-image">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="summaryActions" class="hidden mt-3">
+                <button id="btn-save-sec-summary" class="bg-blue-600 text-white px-3 py-1">Save</button>
+                <button id="btn-cancel-sec-summary" class="border px-3 py-1">Cancel</button>
+            </div>
+        </section>
+
+        <!-- Work -->
+        <section data-section="work experience" class="md:col-span-2 bg-white p-6 rounded-xl shadow">
+            <h2 class="mr-2 inline-block align-middle">Work Experience</h2>
+            <img class="h-6 inline align-middle"
+                id="add-w-exp-section" src="{% static 'image/add2.png' %}" alt="add-image">
+            <div id="workList" class="bg-mist-200 p-3 mt-2 rounded">
+                {% for work_exp in work_experiences %}
+                <article id="w-exp-{{ work_exp.pk }}" class="bg-white shadow-md m-3 p-3 rounded-xl transition hover:shadow-lg">
+                    <div class="flex justify-between items-start flex-wrap gap-2">
+                        <h3 class="text-lg font-bold" data-w-designation="{{ work_exp.designation}}">{{ work_exp.designation }}</h3>
+                        <div class="flex gap-2">
+                            <img class="h-5 cursor-pointer" id="edit-w-exp-section-{{ work_exp.pk }}" data-edit-work="{{ work_exp.pk }}" src="{% static 'image/edit2.png' %}" alt="edit-image">
+                            <img class="h-5 cursor-pointer" id="delete-w-exp-{{ work_exp.pk }}" data-delete-work="{{ work_exp.pk }}" src="{% static 'image/delete.png' %}" alt="delete-image">
+                        </div>
+                    </div>
+                    <span class="block font-light" data-w-company="{{ work_exp.company }}">{{ work_exp.company }}</span>
+                    <span class="block font-thin" data-w-type="{{ work_exp.work_type }}">{{ work_exp.readable_work_type }}</span>
+                    <span class="font-thin" data-w-start_date="{{ work_exp.start_date }}"
+                        data-w-end_date="{{ work_exp.end_date }}">{{ work_exp.start_date }} to {{ work_exp.end_date }}</span>
+                    <div id="" class="flex gap-2 flex-wrap relative">
+                        {% for skill in work_exp.skills %}
+                        <div id="wskill-{{ skill }}-{{ work_exp.pk }}" data-w-skill="{{ skill }}"
+                            class="bg-blue-100 px-2 mx-2 relative">{{ skill }}</div>
+                        {% endfor %}
+                    </div>
+                    <p data-w-description="{{ work_exp.description }}" class="font-light">{{ work_exp.description }}</p>
+                </article>
+                {% empty %}
+                <h2>Add a List of work experiences here..</h2>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Projects -->
+        <section data-section="project" class="md:col-span-2 bg-white p-6 rounded-xl shadow">
+            <h2 class="mr-2 inline-block align-middle">Project</h2>
+            <img class="h-6 inline align-middle"
+                id="add-project-section" src="{% static 'image/add2.png' %}" alt="add-image">
+            <div id="projectList" class="bg-mist-200 p-3 mt-2 rounded">
+                {% for project in projects %}
+                <article id="project-{{ project.pk }}" class="bg-white shadow-md m-3 p-3 rounded-xl transition hover:shadow-lg">
+                    <div class="flex justify-between items-start flex-wrap gap-2">
+                        <h3 class="text-lg font-bold"
+                            data-title="{{ project.title}}">{{ project.title }}</h3>
+                        <div class="flex gap-2">
+                            <img class="h-5 cursor-pointer"
+                            id="edit-project-section-{{ project.pk }}" data-edit-project="{{ project.pk }}"
+                            src="{% static 'image/edit2.png' %}" alt="edit-image">
+                        <img class="h-5 cursor-pointer" id="delete-project-{{ project.pk }}" data-delete-project="{{ project.pk }}" 
+                            src="{% static 'image/delete.png' %}" alt="delete-image">
+                        </div>
+                    </div>
+                    <span class="block font-thin" data-p-start_date="{{ project.start_date }}"
+                        data-p-end_date="{{ project.end_date }}">{{ project.start_date }} to {{ project.end_date }}</span>
+                    <div id="" class="flex gap-2 flex-wrap relative">
+                        {% for skill in project.skills %}
+                        <div id="pskill-{{ skill }}-{{ project.pk }}" data-p-skill="{{ skill }}"
+                            class="bg-blue-100 px-2 mx-2 relative">{{ skill }}</div>
+                        {% endfor %}
+                    </div>
+                    <p data-p-description="{{ project.description }}" class="font-light">{{ project.description }}</p>
+                </article>
+                {% empty %}
+                <h2>Add a List of Projects here..</h2>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Education -->
+        <section data-section="education" class="md:col-span-2 bg-white p-6 rounded-xl shadow">
+            <h2 class="mr-2 inline-block align-middle">Education</h2>
+            <img class="h-6 inline align-middle"
+                id="add-education-section" src="{% static 'image/add2.png' %}" alt="add-image">
+            <div id="educationList" class="bg-mist-200 p-3 mt-2 rounded">
+                {% for education in educations %}
+                <article id="education-{{ education.pk }}" class="bg-white shadow-md m-3 p-3 rounded-xl transition hover:shadow-lg">
+                    <div class="flex justify-between items-start flex-wrap gap-2">
+                        {% if education.level == 'OTH' %}
+                        <h3 class="text-lg font-bold"
+                            data-e-other="{{ education.other}}">{{ education.other }}</h3>
+                        {% else %}
+                        <h3 class="text-lg font-bold"
+                            data-e-level="{{ education.level}}">{{ education.readable_level }}</h3>
+                        {% endif %}
+                        <div class="flex gap-2">
+                            <img class="h-5 cursor-pointer"
+                                id="edit-education-section-{{ education.pk }}" data-edit-education="{{ education.pk }}"
+                                src="{% static 'image/edit2.png' %}" alt="edit-image">
+                            <img class="h-5 cursor-pointer" id="delete-education-{{ education.pk }}" data-delete-education="{{ education.pk }}" 
+                                src="{% static 'image/delete.png' %}" alt="delete-image">
+                        </div>
+                    </div>
+                    <span class="block font-light" data-e-field="{{ education.field }}">{{ education.field }}</span>
+                    <span class="block font-light" data-e-institution="{{ education.institution }}">{{ education.institution }}</span>
+                    <span class="block font-thin" data-e-start_date="{{ education.start_date }}"
+                        data-e-end_date="{{ education.end_date }}">{{ education.start_date }} to {{ education.end_date }}</span>
+                </article>
+                {% empty %}
+                <h2>Add a List of Educations here..</h2>
+                {% endfor %}
+            </div>
+        </section>
+
+    </section>
+</main>
+
+<!-- Modal -->
+<div id="modal" class="fixed inset-0 hidden bg-black/50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded w-[90%] md:w-[60%]">
+        <button id="btn-modal-close" class="float-right">
+            <img class="h-6" src="{% static 'image/cross.png' %}" alt="close-image">
+        </button>
+        <div id="modalContent"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="module" src="{% static 'js/candidate_profile.js' %}"></script>
+{% endblock %}
+
+    

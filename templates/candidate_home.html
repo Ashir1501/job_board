@@ -1,0 +1,48 @@
+{% extends "./base.html" %}
+{% load static %}
+
+{% block title %}
+<title>CareerZ</title>
+{% endblock %}
+
+{% block main %}
+<!-- Main Content -->
+<main class="flex-1 max-w-7xl mx-auto w-full px-6 py-6">
+
+    <!-- Search & Filters -->
+    <section class="mb-6">
+        <form id="job-search" method="get" class="flex gap-4 items-center">
+            <input type="text" name="search" placeholder="Search jobs..."
+                class="flex-1 px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+            <div class="relative">
+                <span id="toggle-filters" class="btn p-3 bg-white border rounded-lg hover:bg-gray-50">
+                    ⚙️
+                </span>
+
+                <!-- Dropdown -->
+                <div id="filterDropdown"
+                    class="hidden absolute right-0 mt-6 w-64 bg-white shadow-lg rounded-lg p-4 space-y-3 z-10 h-70 overflow-y-auto">
+                    <input type="number" name="min_salary" placeholder="Min Salary" class="w-full px-3 py-2 border rounded" />
+                    <input type="number" name="max_salary" placeholder="Max Salary" class="w-full px-3 py-2 border rounded" />
+                    <input type="number" name="min_exp" placeholder="Min Experience" class="w-full px-3 py-2 border rounded" />
+                    <input type="number" name="max_exp" placeholder="Max Experience" class="w-full px-3 py-2 border rounded" />
+                    <input type="text" name="city" placeholder="City" class="w-full px-3 py-2 border rounded" />
+                    <input type="text" name="country" placeholder="Country" class="w-full px-3 py-2 border rounded" />
+                    <input type="submit" class="w-3/6 p-2 bg-blue-300 font-bold  border rounded" value="Apply">
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <!-- Job Layout -->
+    <section id="job-section" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Job List -->
+        <section id="jobList" class="md:col-span-1 space-y-4 h-100 overflow-y-auto">
+            <p>Search for a Job</p>
+            <!-- Job Card -->
+        </section>
+
+    </section>
+</main>
+{% endblock %}

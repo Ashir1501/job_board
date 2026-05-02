@@ -28,8 +28,9 @@ from drf_spectacular.views import (
 )
 urlpatterns = [
     # path('admin/', admin.site.urls),
+    path('',include('appui.urls')),
     path('dashboard/',include('analytics.urls')),
-    path('',include('accounts.urls')),
+    path('auth-api/',include('accounts.urls')),
     path('job-api/',include('jobs.urls')),
     path('application-api/',include('applications.urls')),
     path('profile-api/',include('profiles.urls')),

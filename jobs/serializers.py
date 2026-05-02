@@ -18,6 +18,8 @@ class LocationSerializer(serializers.ModelSerializer):
 class JobSerializer(serializers.ModelSerializer):
 
     locations = LocationSerializer(many=True)
+    is_bookmarked = serializers.SerializerMethodField()
+    bookmark_id = serializers.SerializerMethodField()
     created_by = serializers.SlugRelatedField(
         read_only=True,
         slug_field='username'
@@ -36,12 +38,25 @@ class JobSerializer(serializers.ModelSerializer):
             'salary_max',
             'experience_min',
             'experience_max',
+            'is_bookmarked',
+            'bookmark_id',
             'is_active',
             'created_by',
             'updated_by'
         ]
         read_only_fields = ['pk','created_by','description_html','updated_by']
         extra_kwargs = {'description':{'write_only':True}}
+
+    def get_is_bookmarked(self, obj):
+        user = self.context['request'].user
+        return user.bookmarks.filter(job=obj).exists()
+    
+    def get_bookmark_id(self,obj):
+        user = self.context['request'].user
+        if(user.bookmarks.filter(job=obj).exists()):
+            bookmark = user.bookmarks.get(job=obj)
+            return bookmark.pk
+        return None
 
     def validate(self, attrs):
         validate_job(attrs)
@@ -87,8 +102,8 @@ class BookmarkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bookmark
-        fields = ['job','user','created_at']
-        read_only_fields = ['user','created_at']
+        fields = ['pk','job','user','created_at']
+        read_only_fields = ['pk','user','created_at']
 
     def validate(self, attrs):
         job = attrs.get('job',None)
@@ -97,12 +112,11 @@ class BookmarkSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        user = self.context['request'].user
         job = validated_data.get('job')
+        user = validated_data.get('user')
 
         if Bookmark.objects.filter(user=user,job=job).exists():
             raise serializers.ValidationError('Bookmark already exists.')
         
-        validated_data['user'] = user
-        obj = Job.objects.create(**validated_data)
+        obj = Bookmark.objects.create(**validated_data)
         return obj

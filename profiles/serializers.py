@@ -11,6 +11,8 @@ import filetype
 
 class CandidateSerializer(serializers.ModelSerializer):
     resume = serializers.FileField(required=False)
+    resume_name = serializers.SerializerMethodField()
+    resume_url = serializers.SerializerMethodField()
     skill_list = serializers.ListField(
         child = serializers.CharField(max_length=30),
         write_only=True,
@@ -23,13 +25,19 @@ class CandidateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CandidateProfile
-        fields = ['pk','summary','resume','skills','skill_list','user','updated_by']
-        read_only_fields = ['pk','user','updated_by','skills']
+        fields = ['pk','summary','resume','resume_name','resume_url','skills','skill_list','user','updated_by']
+        read_only_fields = ['pk','user','updated_by','skills','resume_name','resume_url']
+
+    def get_resume_name(self,obj):
+        return obj.resume.name.split('/')[2]
+
+    def get_resume_url(self,obj):
+        return obj.resume.url
 
     def validate_resume(self,value):
         file = value
-        if file is None:
-            return file
+        if file is None or file == '':
+            return None
         
         if file.size > 2 * 1024 * 1024:
             raise serializers.ValidationError('File size should be under 2MB.')
@@ -65,7 +73,7 @@ class CandidateSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
-class WorkExperienceSerailizer(serializers.ModelSerializer):
+class WorkExperienceSerializer(serializers.ModelSerializer):
     skill_list = serializers.ListField(
         child = serializers.CharField(max_length=30),
         write_only=True,
@@ -75,11 +83,16 @@ class WorkExperienceSerailizer(serializers.ModelSerializer):
         read_only=True,
         slug_field = 'name'
     )
+    readable_work_type = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkExperience
-        fields = ['designation','company','work_type','description','skills','skill_list','start_date','end_date']
+        fields = ['pk','designation','company','work_type','readable_work_type','description','skills','skill_list','start_date','end_date']
+        read_only_fields = ['pk','readable_work_type']
 
+    def get_readable_work_type(self,obj):
+        return obj.get_work_type_display()
+    
     def validate(self, attrs):
         validate_start_end_date(attrs)
         return attrs
@@ -119,7 +132,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Project
-        fields = ['title','description','skills','skill_list','start_date','end_date']
+        fields = ['pk','title','description','skills','skill_list','start_date','end_date']
+        read_only_fields = ['pk']
 
     def validate(self, attrs):
         validate_start_end_date(attrs)
@@ -152,9 +166,15 @@ class ProjectSerializer(serializers.ModelSerializer):
         return obj
     
 class EducationSerializer(serializers.ModelSerializer):
+    readable_level = serializers.SerializerMethodField()
+
     class Meta:
         model = Education
-        fields = ['level','other','field','institution','start_date','end_date']
+        fields = ['pk','level','readable_level','other','field','institution','start_date','end_date']
+        read_only_fields = ['pk','readable_level']
+
+    def get_readable_level(self,obj):
+        return obj.get_level_display()
 
     def validate(self, attrs):
         level = attrs.get('level', None)

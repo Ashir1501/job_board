@@ -6,7 +6,7 @@ from celery import shared_task
 from django.db import close_old_connections
 
 @shared_task(rate_limit='10/m',bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={'max_retries': 5})
-def new_application_mailer_task(pk):
+def new_application_mailer_task(self,pk):
     close_old_connections()
     application = Application.objects.select_related('job','user').get(pk=pk)
     title = application.job.title
@@ -79,7 +79,7 @@ def new_application_mailer_task(pk):
         connection.send_messages([msg_ca,msg_re])
     
 @shared_task(rate_limit='10/m',bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={'max_retries': 5})
-def application_status_mailer_task(pk):
+def application_status_mailer_task(self,pk):
     close_old_connections() #Inside Celery tasks, DB connections can get stale. 
     application = Application.objects.select_related('job','user').get(pk=pk)
     title = application.job.title

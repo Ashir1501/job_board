@@ -1,9 +1,9 @@
 from rest_framework import viewsets, mixins, permissions
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, JSONParser
 from .serializers import (
     CandidateSerializer,
     RecruiterSerializer,
-    WorkExperienceSerailizer,
+    WorkExperienceSerializer,
     EducationSerializer,
     ProjectSerializer
 )
@@ -31,7 +31,7 @@ class RetrieveUpdateViewSet(
 class CandidateProfileViewSet(RetrieveUpdateViewSet):
     serializer_class = CandidateSerializer
     permission_classes = [permissions.IsAuthenticated, IsCandidate]
-    parser_classes = [MultiPartParser]             
+    parser_classes = [MultiPartParser, JSONParser]             
 
     def get_queryset(self):
         return CandidateProfile.objects.filter(user=self.request.user)
@@ -51,7 +51,7 @@ class RecruiterProfileViewSet(RetrieveUpdateViewSet):
 
 class WorkExpViewSet(viewsets.ModelViewSet):
     queryset = WorkExperience.objects.all()
-    serializer_class = WorkExperienceSerailizer
+    serializer_class = WorkExperienceSerializer
 
     def get_permissions(self):
         action_permission = {

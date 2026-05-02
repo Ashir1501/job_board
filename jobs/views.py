@@ -50,6 +50,8 @@ class JobViewSet(CreateListRetrieveUpdateViewSet):
             'partial_update': [IsRecruiter, IsRecruiterOwner],
             'retrieve': [IsCandidateOrIsRecruiterOwner],
             'applications': [IsRecruiter, IsRecruiterOwner],
+            'bookmarked_jobs':[],
+            'applied_jobs':[]
         }
         permission_classes = action_permissions.get(self.action,[]) + [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -72,6 +74,30 @@ class JobViewSet(CreateListRetrieveUpdateViewSet):
         serializer = ApplicationSerializer(applications, many=True)
         return response.Response(serializer.data, status=status.HTTP_200_OK)
     
+    @action(detail=False)
+    def bookmarked_jobs(self,request):
+        user = request.user
+        jobs = Job.objects.filter(bookmarked_by__user=user)
+        page = self.paginate_queryset(jobs)
+        if page is not None:
+            serializer = JobSerializer(page,many=True, context={'request':request})
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = JobSerializer(jobs,many=True,context={'request':request})
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False)
+    def applied_jobs(self,request):
+        user = request.user
+        jobs = Job.objects.filter(applications__user=user)
+        page = self.paginate_queryset(jobs)
+        if page is not None:
+            serializer = JobSerializer(page,many=True,context={'request':request})
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = JobSerializer(jobs,many=True,context={'request':request})
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
+    
 
 class BookmarkViewSet(CreateListDestroyViewSet):
     serializer_class = BookmarkSerializer
@@ -79,3 +105,6 @@ class BookmarkViewSet(CreateListDestroyViewSet):
     def get_queryset(self):
         user = self.request.user
         return user.bookmarks.all()
+    
+    def perform_create(self, serializer):
+        serializer.save(user = self.request.user)
