@@ -8,6 +8,7 @@ from .models import (
 )
 from .service import validate_start_end_date, get_skills
 import filetype
+from django.db import IntegrityError
 
 class CandidateSerializer(serializers.ModelSerializer):
     resume = serializers.FileField(required=False)
@@ -29,10 +30,14 @@ class CandidateSerializer(serializers.ModelSerializer):
         read_only_fields = ['pk','user','updated_by','skills','resume_name','resume_url']
 
     def get_resume_name(self,obj):
-        return obj.resume.name.split('/')[2]
+        if obj.resume:
+            return obj.resume.name.split('/')[2]
+        return None
 
     def get_resume_url(self,obj):
-        return obj.resume.url
+        if obj.resume:
+            return obj.resume.url
+        return None
 
     def validate_resume(self,value):
         file = value
@@ -101,12 +106,15 @@ class WorkExperienceSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         validated_data['profile'] = user.candidate_profile
         skills = validated_data.pop('skill_list',None)
-        obj = WorkExperience.objects.create(**validated_data)
+        try:
+            obj = WorkExperience.objects.create(**validated_data)
 
-        if skills is not None:
-            skill_objs = get_skills(skills)
-            obj.skills.set(skill_objs)
-        return obj
+            if skills is not None:
+                skill_objs = get_skills(skills)
+                obj.skills.set(skill_objs)
+            return obj
+        except IntegrityError:
+            raise serializers.ValidationError({'non_field_errors':['Work Experience already exists.']})
     
     def update(self, instance, validated_data):
         skills = validated_data.pop('skill_list',None)
@@ -116,9 +124,11 @@ class WorkExperienceSerializer(serializers.ModelSerializer):
         
         for attr, value in validated_data.items():
             setattr(instance,attr,value)
-        
-        instance.save()
-        return instance
+        try:
+            instance.save()
+            return instance
+        except IntegrityError:
+            raise serializers.ValidationError({'non_field_errors':['Work Experience already exists.']})
     
 class ProjectSerializer(serializers.ModelSerializer):
     skill_list = serializers.ListField(
@@ -190,8 +200,20 @@ class EducationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         validated_data['profile'] = user.candidate_profile
-        obj = Education.objects.create(**validated_data)
-        return obj
+        try:
+            obj = Education.objects.create(**validated_data)
+            return obj
+        except IntegrityError:
+            raise serializers.ValidationError({'non_field_errors':['Education already exists.']})
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance,attr,value)
+        try:
+            instance.save()
+            return instance
+        except IntegrityError:
+            raise serializers.ValidationError({'non_field_errors':['Education already exists.']})
     
 class RecruiterSerializer(serializers.ModelSerializer):
     class Meta:

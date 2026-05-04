@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, renderer_classes, permission_cla
 from django.shortcuts import redirect
 from allauth.account.admin import EmailAddress
 from profiles.serializers import WorkExperienceSerializer, ProjectSerializer, EducationSerializer
-
+from django.views.decorators.cache import never_cache
 # Create your views here.
 
 @api_view(['GET'])
@@ -23,17 +23,22 @@ def home(request):
     else:
         return Response({'user':request.user}, template_name='recruiter_home.html')
         
-
+@never_cache
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
 @permission_classes([AllowAny])
 def login(request):
+    if(request.user.is_authenticated):
+        return redirect('home')
     return Response({'user':request.user},template_name='login.html')
 
+@never_cache
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
 @permission_classes([AllowAny])
 def register_view(request):
+    if(request.user.is_authenticated):
+        return redirect('home')
     return Response({'user':request.user},template_name='register.html')
 
 @api_view(['GET'])

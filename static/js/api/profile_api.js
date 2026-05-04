@@ -1,4 +1,5 @@
 import { closeModal } from "../ui/profile_render.js";
+import { messageBox } from "../ui/main_render.js";
 
 export async function updateProfileAPI(data){
     const endpoint = '/profile-api/candidates/0/';
@@ -96,6 +97,7 @@ export function attachFormHandler(config) {
         } else {
             const err = await response.json();
             console.log(err);
+            messageBox({error:err})
         }
     });
 }

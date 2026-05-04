@@ -25,19 +25,21 @@ import {
     deleteEducation
 } from "./api/profile_api.js";
 
+import { messageBox } from "./ui/main_render.js";
+
 document.addEventListener('DOMContentLoaded',function(){
     const verifyLink = document.querySelector('#verify-link');
     const emailElem = document.querySelector('#email');
     email = emailElem.dataset.email;
     if(verifyLink){
         verifyLink.addEventListener('click',async function(){
-            console.log('verify link')
             let response = await resendEmail(email);
             if(response.ok){
-                console.log('Verification Email has been sent');
+                messageBox({content:'Verification Email has been sent'})
             }else{
-                let message = await response.json();
-                console.log(message);
+                let err = await response.json();
+                console.log(err);
+                messageBox({error:err})
             }
         });
     }
@@ -52,6 +54,19 @@ document.addEventListener('click',async function(event){
     const summaryElem = document.getElementById('summary');
     const addImg = document.getElementById('add-img'); 
     const summarySaveElem = document.getElementById('btn-save-sec-summary');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    if(logoutBtn && logoutBtn.contains(event.target)){
+        let response = await fetch('/auth-api/dj-rest-auth/logout/',{
+            method:'POST',
+        })
+        if(response.ok){
+            window.location.href = '/'
+        }else{
+            let err = await response.json()
+            messageBox({error:err})
+        }
+    }
 
     if(editImg && editImg.contains(event.target)){
         // This makes the summary content editable
@@ -105,8 +120,9 @@ document.addEventListener('click',async function(event){
             summarySkills = []
             
         }else{
-            let message = await response.json();
-            console.log(message)
+            let err = await response.json();
+            console.log(err)
+            messageBox({error:err})
         }    
     }
     // ---------------------------------------------------
@@ -262,6 +278,7 @@ async function handleDeleteWork(pk, article) {
         } else {
             const err = await response.json();
             console.log(err);
+            messageBox({error:err})
         }
 
     } catch (error) {
@@ -288,10 +305,11 @@ async function handleDeleteProject(pk, article) {
         } else {
             const err = await response.json();
             console.log(err);
+            messageBox({error:err})
         }
 
     } catch (error) {
-        console.error('Delete failed:', error);
+        console.error('Delete failed');
     }
 }
 
@@ -549,10 +567,11 @@ async function handleDeleteEducation(pk, article) {
         } else {
             const err = await response.json();
             console.log(err);
+            messageBox({error:err})
         }
 
     } catch (error) {
-        console.error('Delete failed:', error);
+        console.error('Delete failed');
     }
 }
 

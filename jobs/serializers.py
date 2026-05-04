@@ -24,6 +24,7 @@ class JobSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username'
         )
+    application_status = serializers.SerializerMethodField()
 
     class Meta:
         model = Job
@@ -32,6 +33,7 @@ class JobSerializer(serializers.ModelSerializer):
             'title', 
             'job_type',
             'description',
+            'application_status',
             'description_html',
             'locations', 
             'salary_min', 
@@ -44,7 +46,7 @@ class JobSerializer(serializers.ModelSerializer):
             'created_by',
             'updated_by'
         ]
-        read_only_fields = ['pk','created_by','description_html','updated_by']
+        read_only_fields = ['pk','created_by','description_html','updated_by','application_status']
         extra_kwargs = {'description':{'write_only':True}}
 
     def get_is_bookmarked(self, obj):
@@ -57,7 +59,13 @@ class JobSerializer(serializers.ModelSerializer):
             bookmark = user.bookmarks.get(job=obj)
             return bookmark.pk
         return None
-
+    
+    def get_application_status(self, obj):
+        app = getattr(obj, 'user_application', None)
+        if app:
+            return app[0].status
+        return None
+    
     def validate(self, attrs):
         validate_job(attrs)
         title = attrs.get('title')

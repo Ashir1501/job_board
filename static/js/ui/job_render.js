@@ -1,6 +1,6 @@
 import { create_bookmark, delete_bookmark } from "../api/bookmark_api.js";
 import {jobFilterNav} from "../api/job_api.js";
-
+import { messageBox } from "./main_render.js";
 let bookmarkState = new Map()
 
 export default function renderJobs(container, data) {
@@ -30,6 +30,19 @@ export default function renderJobs(container, data) {
           ₹${job.salary_min} - ₹${job.salary_max} • ${job.experience_min}-${job.experience_max} yrs
         </p>
       `;
+        if(job.application_status){
+            let status = {
+                'PEN':'Pending',
+                'VEW':'Viewed',
+                'SHL':'Shortlisted',
+                'REJ':'Rejected'
+            }
+            article.innerHTML = article.innerHTML + `
+            <div class='flex flex-wrap justify-end'>
+                <span class='px-2 border-2 rounded'>${status[job.application_status]}</span>
+            </div>
+            `
+        }
 
         // click → update right panel
         article.addEventListener('click', () => {
@@ -116,8 +129,9 @@ function selectJob(container,article,job_id,title, company, description, locatio
                         bookmark_id: result.pk
                     })
                 }else{
-                    const result = await response.json();
-                    console.log(result);
+                    const err = await response.json();
+                    console.log(err);
+                    messageBox({error:err})
                 }
             }else{
                 const response = await delete_bookmark(state.bookmark_id);
@@ -136,8 +150,9 @@ function selectJob(container,article,job_id,title, company, description, locatio
                         bookmark_id: null
                     })
                 }else{
-                    const result = await response.json()
-                    console.log(result) 
+                    const err = await response.json()
+                    console.log(err) 
+                    messageBox({error:err})
                 }
             }
         });
@@ -179,8 +194,9 @@ export function jobNavigation(container, next, previous){
                 let result = await response.json()
                 renderJobs(container,result)
             }else{
-                let message = await response.json()
-                console.log(message)
+                let err = await response.json()
+                console.log(err)
+                messageBox({error:err})
             }
         });
     }
@@ -194,8 +210,9 @@ export function jobNavigation(container, next, previous){
                 let result = await response.json()
                 renderJobs(container,result)
             }else{
-                let message = await response.json()
-                console.log(message)
+                let err = await response.json()
+                console.log(err)
+                messageBox({error:err})
             }
         });
     }

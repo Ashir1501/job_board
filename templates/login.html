@@ -44,12 +44,19 @@
 
             <footer class="mt-6 text-center text-sm text-gray-500">
                 <div>
-                    <p class="font-bold">Not Registered? <a class="underline underline-offset-2 text-blue-500 font-bold" href="{% url 'register' %}">Create an Account</a></p>
+                    <p class="font-bold">Not Registered? <a class="underline underline-offset-2 text-blue-500 font-bold"
+                            href="{% url 'register' %}">Create an Account</a></p>
                 </div>
                 <p>&copy; 2026</p>
             </footer>
         </section>
     </main>
+    <!-- Modal message -->               
+    <div id="message" class="relative hidden">
+        <div class="fixed top-[5%] left-[20%] p-6 border-2 rounded w-[60%] md:w-[60%]">
+            <div id="messageContent" class="flex flex-wrap gap-2"></div>
+        </div>
+    </div>
     <script type="module" src="{% static 'js/main.js' %}"></script>
 </body>
 

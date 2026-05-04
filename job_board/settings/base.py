@@ -84,7 +84,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware' # Third Party
+    'allauth.account.middleware.AccountMiddleware', # Third Party
+    'accounts.middleware.JWTSetCookieMiddleware', # sets access token in cookie
 ]
 
 ROOT_URLCONF = 'job_board.urls'
@@ -178,7 +179,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
+        "accounts.authentication.CookieJWTAuthentication", #custom authentication
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',

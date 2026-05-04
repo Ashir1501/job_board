@@ -1,5 +1,6 @@
 import { bookmarkedJobs, appliedJobs } from "./api/job_api.js";
 import renderJobs from "./ui/job_render.js";
+import { messageBox } from "./ui/main_render.js";
 
 document.addEventListener('DOMContentLoaded', async function(){
 
@@ -45,8 +46,10 @@ document.addEventListener('DOMContentLoaded', async function(){
                 let result = await bookmarkResponse.json()
                 bookmarkData = result
             }else{
-                let message = await bookmarkResponse.json()
-                console.log(message)
+                let err = await bookmarkResponse.json()
+                console.log(err)
+                messageBox({error:err})
+
             }
             appliedListC.innerHTML=''
             const appliedAside = document.querySelector('#appliedListaside');
@@ -73,9 +76,11 @@ async function appliedJobRequest(appliedListC, bookmarkListC){
     if(appliedResponse.ok){
         let result = await appliedResponse.json()
         appliedData = result
+        console.log(appliedData)
     }else{
-        let message = await appliedResponse.json()
-        console.log(message)
+        let err = await appliedResponse.json()
+        console.log(err)
+        messageBox({error:err})
     }
     bookmarkListC.innerHTML = ''
     const bookmarkAside = document.querySelector('#bookmarkedListaside')

@@ -7,6 +7,8 @@ from accounts.permissions import IsRecruiter, IsRecruiterOwner, IsCandidateOrIsR
 from accounts.models import User
 from rest_framework.decorators import action
 from applications.serializers import ApplicationSerializer
+from django.db.models import Prefetch
+from applications.models import Application
 # Create your views here.
 
 
@@ -88,8 +90,15 @@ class JobViewSet(CreateListRetrieveUpdateViewSet):
 
     @action(detail=False)
     def applied_jobs(self,request):
-        user = request.user
-        jobs = Job.objects.filter(applications__user=user)
+        jobs = Job.objects.filter(
+            applications__user=request.user
+        ).prefetch_related(
+            Prefetch(
+                'applications',
+                queryset=Application.objects.filter(user=request.user),
+                to_attr='user_application'
+            )
+        )
         page = self.paginate_queryset(jobs)
         if page is not None:
             serializer = JobSerializer(page,many=True,context={'request':request})

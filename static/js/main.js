@@ -4,6 +4,7 @@ import jobFilter from './api/job_api.js';
 import renderJobs from './ui/job_render.js';
 import post_application from './api/application_post.js';
 import { bookmarkedJobs, appliedJobs } from './api/job_api.js';
+import { messageBox } from './ui/main_render.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -33,9 +34,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     // ---------------------------------------------------
+    // if(location.href.includes('/home/')){
+    //     console.log(location.href)
+    //     history.pushState(null, null, location.href);
+    //     // window.onpopstate = function () {
+    //     //     history.go(1);
+    //     // };
+    // }
 
     // login request
-    const loginFormElem = document.getElementById('login-form')
+    const loginFormElem = document.getElementById('login-form');
     if (loginFormElem) {
         loginFormElem.onsubmit = async (e) => {
             e.preventDefault();
@@ -47,8 +55,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.href = '/'
 
             } else {
-                let message = await response.json();
-                console.log(message)
+                let err = await response.json();
+                console.log(err)
+                messageBox({error: err})
+                
             }
         };
     }
@@ -67,8 +77,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.href = '/'
 
             } else {
-                let message = await response.json();
-                console.log(message)
+                let err = await response.json();
+                console.log(err)
+                messageBox({error:err})
             }
         };
     }
@@ -97,8 +108,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 renderJobs(container, data)
 
             } else {
-                let message = await response.json()
-                console.log(message)
+                let err = await response.json()
+                console.log(err)
+                messageBox({error:err})
             }
         })
     }
@@ -126,9 +138,11 @@ document.addEventListener('click', function (event) {
             if(response.ok){
                 let result = await response.json()
                 console.log(result)
+                messageBox({content:'You will receive an email about this application soon.'})
             }else{
-                let message = await response.json()
-                console.log(message)
+                let err = await response.json()
+                console.log(err)
+                messageBox({error:err})
             }
         }
     }

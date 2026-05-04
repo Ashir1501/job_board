@@ -47,6 +47,12 @@
             © 2026 Careerz. All rights reserved.
         </div>
     </footer>
+    <!-- Modal message -->               
+    <div id="message" class="relative hidden">
+        <div class="fixed top-[5%] left-[20%] p-6 border-2 rounded w-[60%] md:w-[60%]">
+            <div id="messageContent" class="flex flex-wrap gap-2"></div>
+        </div>
+    </div>
     <script type="module" src="{% static 'js/main.js' %}"></script>
     {% block script %}
     {% endblock %}
