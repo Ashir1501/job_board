@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import mixins, permissions, viewsets
+from rest_framework import mixins, permissions, viewsets, status
 from .tasks import application_status_mailer_task, new_application_mailer_task
 from .serializers import ApplicationSerializer, ApplicationStatusSerializer
 from accounts.permissions import IsCandidate, IsRecruiter
@@ -8,7 +8,9 @@ from .models import Application
 from .filters import ApplicationFilter, filters
 from django.db import IntegrityError, transaction
 from rest_framework.exceptions import ValidationError
-from functools import partial
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from profiles.serializers import ApplicantProfileSerializer
 # Create your views here.
 
 
@@ -30,6 +32,7 @@ class ApplicationViewSet(CreateUpdateListViewSet):
             'create': [IsCandidate],
             'partial_update': [IsRecruiter],
             'update':[IsRecruiter],
+            'applicant_profile':[IsRecruiter],
         }
         permission_classes = action_permission.get(self.action,[]) + [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
@@ -71,3 +74,13 @@ class ApplicationViewSet(CreateUpdateListViewSet):
             transaction.on_commit(
                 lambda: application_status_mailer_task.delay(instance.pk) #sends task to celary
             )
+    
+    @action(detail=True,methods=['get'])
+    def applicant_profile(self, request, pk=None):
+        application = self.get_object()
+        if(application.status == Application.PENDING):
+            application.status = Application.VIEWED
+            application.save()
+        profile = application.user.candidate_profile
+        serializer = ApplicantProfileSerializer(profile)
+        return Response(serializer.data,status=status.HTTP_200_OK)

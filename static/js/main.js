@@ -1,10 +1,18 @@
 import accountLogin from './api/account_login.js'
 import accountRegister from './api/account_register.js';
 import jobFilter from './api/job_api.js';
-import renderJobs from './ui/job_render.js';
+import {
+    renderJobs, 
+    initializeEditMarkdownPreview, 
+    editJobModal, 
+    updatePreview,
+    jobsState,
+    insertMarkdown,
+    wrapMarkdown } from './ui/job_render.js';
 import post_application from './api/application_post.js';
-import { bookmarkedJobs, appliedJobs } from './api/job_api.js';
+import { bookmarkedJobs, appliedJobs, updateJobAPI } from './api/job_api.js';
 import { messageBox } from './ui/main_render.js';
+import { openModal, closeModal } from './ui/profile_render.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -34,13 +42,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     // ---------------------------------------------------
-    // if(location.href.includes('/home/')){
-    //     console.log(location.href)
-    //     history.pushState(null, null, location.href);
-    //     // window.onpopstate = function () {
-    //     //     history.go(1);
-    //     // };
-    // }
 
     // login request
     const loginFormElem = document.getElementById('login-form');
@@ -117,7 +118,62 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-document.addEventListener('click', function (event) {
+document.addEventListener('submit', async (event) => {
+
+    if(event.target.id == 'edit-job-form'){
+        event.preventDefault()
+    
+        const form = event.target
+    
+        const jobId = form.dataset.jobid
+    
+        const description =
+            document.getElementById('markdown-input').value
+    
+        const isActive =
+            form.is_active.value === 'true'
+    
+        const dataToUpdate = {
+            jobId,
+            description,
+            is_active: isActive
+        }
+        const response = await updateJobAPI(dataToUpdate)
+        if(response.ok){
+            let data = await response.json();
+            const description = document.getElementById('description-plain');
+            const statusDiv = document.querySelector('.active-status');
+            description.innerHTML = data.description_html
+            const status = statusDiv.dataset.isactive
+
+            // updating job state
+            const jobStateData = jobsState.get(data.pk)
+            jobStateData.is_active = data.is_active
+            jobStateData.description = data.description
+            jobStateData.description_html = data.description_html
+
+            if(status === 'true' && data.is_active === false){
+                statusDiv.dataset.isActive = 'false'
+                const statusImg = statusDiv.querySelector('img')
+                statusImg.src = '/static/image/not_active.png'
+                
+            }else if(status === 'false' && data.is_active === true){
+                statusDiv.dataset.isActive = 'true'
+                const statusImg = statusDiv.querySelector('img')
+                statusImg.src = '/static/image/active.png'
+            }
+            messageBox({content:'Update Successfull'})
+            closeModal()
+        }else{
+            let err = await response.json();
+            messageBox({error:err})
+        }
+    }
+
+
+})
+
+document.addEventListener('click',async function (event) {
     const dropdown = document.getElementById('filterDropdown');
     const toggleFilterBtn = document.getElementById('toggle-filters');
 
@@ -144,6 +200,109 @@ document.addEventListener('click', function (event) {
                 console.log(err)
                 messageBox({error:err})
             }
+        }
+    }
+
+    const descriptionPlain = document.querySelector('#description-plain');
+    if(descriptionPlain){
+        const listElem = descriptionPlain.querySelector('ul')
+        if(listElem){
+            listElem.className = 'list-disc'
+        }
+        const heading1 = descriptionPlain.querySelector('h1')
+        if(heading1){
+            heading1.className = 'text-2xl'
+        }
+        const heading2 = descriptionPlain.querySelector('h2')
+        if(heading2){
+            heading2.className = 'text-xl'
+        }
+        const heading3 = descriptionPlain.querySelector('h3')
+        if(heading3){
+            heading3.className = 'text-lg'
+        }
+        const strongElem = descriptionPlain.querySelector('strong');
+        if(strongElem){
+            strongElem.className = 'font-bold'
+        }
+        const italicElem = descriptionPlain.querySelector('em')
+        if(italicElem){
+            italicElem.className = 'italic';
+        }
+        const anchorElem = descriptionPlain.querySelector('a');
+        if(anchorElem){
+            anchorElem.className = 'underline text-blue-500'
+        }
+    }
+
+    const closeModalBtn = document.getElementById('btn-modal-close');
+    if(closeModalBtn && closeModalBtn.contains(event.target)){
+        closeModal()
+    }
+
+    const cancelModalBtn = document.getElementById('cancel-edit-job');
+    if(cancelModalBtn && cancelModalBtn.contains(event.target)){
+        closeModal()
+    }
+
+    if(event.target.closest('.view-applications')) {
+        const jobId = event.target.dataset.jobid;
+        window.location.href = `/jobs/${jobId}/applications/`
+    }
+
+    const editBtn = event.target.closest('.edit-job')
+    if(editBtn){
+        const jobId = editBtn.dataset.jobid
+        const statusEle = document.querySelector('.active-status') 
+        const descriptionEle = document.querySelector('#description-plain')
+    
+    
+        openModal(`
+            <div class="p-10 text-center">
+                Loading job...
+            </div>
+        `)
+        const jobStateData = jobsState.get(Number(jobId)) 
+        const job = {
+            id: jobId,
+            is_active: jobStateData.is_active,
+            description: jobStateData.description
+        }
+        document.getElementById('modalContent').innerHTML = editJobModal(job)
+
+        initializeEditMarkdownPreview()
+    }
+
+
+    const textarea = document.getElementById('markdown-input')
+
+    if(textarea){
+        if(event.target.closest('.md-bold')){
+            wrapMarkdown(textarea, '**')
+        }
+    
+        else if(event.target.closest('.md-italic')){
+            wrapMarkdown(textarea, '*')
+        }
+    
+        else if(event.target.closest('.md-h1')){
+            insertMarkdown(textarea, '# ')
+        }
+    
+        else if(event.target.closest('.md-h2')){
+            insertMarkdown(textarea, '## ')
+        }
+    
+        else if(event.target.closest('.md-h3')){
+            insertMarkdown(textarea, '### ')
+        }
+    
+        else if(event.target.closest('.md-list')){
+            insertMarkdown(textarea, '\n- ')
+        }
+    
+        else if(event.target.closest('.md-link')){
+            insertMarkdown(textarea, '[text](https://)')
         }
     }
 

@@ -1,0 +1,59 @@
+{% extends './base.html' %}
+{% load static %}
+
+{% block title %}
+<title>CareerZ: profile</title>
+{% endblock %}
+
+{% block main %}
+<main class="flex-1 max-w-7xl mx-auto w-full px-6 py-6">
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Profile -->
+        <section class="bg-white p-6 rounded-xl shadow" id="profile-Box">
+            <h2 class="font-semibold mb-3">Profile</h2>
+            <p><span class="inline-block w-1/5 text-left">Email:</span> <span id="email"
+                    class="inline-block w-1/5 text-left" data-email="{{ email }}">{{ email }}</span></p>
+            <p><span class="inline-block w-1/5 text-left">Username:</span> <span id="username"
+                    class="inline-block w-1/5 text-left">{{ username }}</span></p>
+            <p>
+                {% if is_verified %}
+                <span class="inline text-green-600 font-semibold align-middle">Verified:</span> <span id="verified"
+                    class="inline" id="verified"><img class="inline h-10" src="{% static 'image/verified.png' %}"
+                        alt="verified-image"></span>
+                {% else %}
+                <span class="inline text-red-600 align-middle">Verified:</span> <span id="verified" class="inline"
+                    id="not-verified"><img class="inline h-10" src="{% static 'image/not_verified.png' %}"
+                        alt="not-verified-image"></span>
+                {% endif %}
+            </p>
+            <p>
+                {% if is_verified is False %}
+                <a id="verify-link" class="underline text-blue-500" href="#">Click on this link to verify your Email</a>
+                {% endif %}
+            </p>
+            <button id="logout-btn" class="p-2 border-2 border-red-500 rounded cursor-pointer font-bold">Log Out</button>
+        </section>
+
+        <!-- Summary -->
+        <section class="bg-white p-6 rounded-xl shadow">
+            <h2 class="inline-block align-baseline font-semibold mb-3 mr-3">Summary</h2><img id="edit-summary-section"
+                class="inline-block h-8 align-middle cursor-pointer" src="{% static 'image/edit.png' %}" alt="edit_image">
+                <p id="company" class="font-light" data-original="{{ company }}" class="" contenteditable="false">{{ company }}</p>
+                <p id="website" class="font-light" data-original="{{ website }}" class="" contenteditable="false">{{ website }}</p>
+                <p id="description" class="font-light" data-original="{{ description }}" class="" contenteditable="false">{{ description }}</p>
+
+            <div id="summaryActions" class="hidden mt-3">
+                <button id="btn-save-sec-summary" class="cursor-pointer bg-blue-600 text-white px-3 py-1">Save</button>
+                <button id="btn-cancel-sec-summary" class="cursor-pointer border px-3 py-1">Cancel</button>
+            </div>
+        </section>
+    </section>
+</main>
+{% endblock %}
+
+{% block script %}
+<script type="module" src="{% static 'js/recruiter_profile.js' %}"></script>
+{% endblock %}
+

@@ -28,7 +28,11 @@ class CookieJWTAuthentication(JWTAuthentication):
                 user = self.get_user(validated_token)
 
                 # attach new token to request (for response later)
-                request._new_access_token = new_access
+                # since drf request is a wrapper of django httprequest 
+                # so its better to set access token to _request (dj http request)
+                # so that middleware could access the token and set it to the cookie
+                django_request = getattr(request, '_request', request)
+                django_request._new_access_token = new_access
 
                 return (user, validated_token)
 

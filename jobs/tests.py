@@ -244,8 +244,8 @@ class JobTests(JobTestSetUp):
             'title': 'Python Developer',
             'job_type': 'FULL',
             'description': 'something something...',
-            'salary_min': 30000,
-            'salary_max': 20000,
+            'salary_min': 20000,
+            'salary_max': 30000,
             'experience_min': 0,
             'experience_max':1,
             'created_by': self.recruiter
@@ -261,8 +261,8 @@ class JobTests(JobTestSetUp):
         # attempt fails since recruiter can access only his job
         url = reverse('job-detail', kwargs={'pk': job.id})
         data = {
-            'salary_min': 1000,
-            'salary_max': 2000
+            'description': "some description",
+            'is_active': False
         }
         response = self.client.patch(url, data, format='json')
 
@@ -270,7 +270,8 @@ class JobTests(JobTestSetUp):
         error = response.data.get('detail')
         self.assertEqual(error.code,'not_found')
 
-        # recruiter attempting to update his own job
+        # recruiter attempting to update fields other that description and is_active
+        # which does not get updated
         self.client.force_authenticate(user=self.recruiter)
 
         url = reverse('job-detail', kwargs={'pk': job.id})
@@ -287,8 +288,26 @@ class JobTests(JobTestSetUp):
             'created_by': response.data.get('created_by')
         }
         self.assertEqual(response_data,{
-            'salary_min':1000,
-            'salary_max': 2000,
-            'created_by': self.recruiter.username
+            'salary_min':None,
+            'salary_max': None,
+            'created_by': None
+        })
+        
+        # recruiter attempting to update fields
+        self.client.force_authenticate(user=self.recruiter)
+
+        url = reverse('job-detail', kwargs={'pk': job.id})
+        data = {
+            'description': 'some description..',
+            'is_active': False
+        }
+        response = self.client.patch(url, data, format='json')
+
+        self.assertEqual(response.status_code,status.HTTP_200_OK)
+        response_data = {
+            'is_active': response.data.get('is_active')
+        }
+        self.assertEqual(response_data,{
+            'is_active':False
         })
 

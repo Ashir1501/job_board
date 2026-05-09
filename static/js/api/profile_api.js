@@ -101,3 +101,24 @@ export function attachFormHandler(config) {
         }
     });
 }
+
+
+
+export async function updateRecruiterProfileAPI(data){
+    const endpoint = '/profile-api/recruiters/0/';
+
+    const bodyData = JSON.stringify({
+        'description':data.description,
+        'company':data.company,
+        'website': data.website
+    })
+    let response = await fetch(endpoint,{
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: bodyData
+    })
+    return response
+    
+}

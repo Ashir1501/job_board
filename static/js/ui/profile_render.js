@@ -653,3 +653,80 @@ export function updateEducationInDOM(edu) {
     `;
 }
 
+
+export function editRecruiterSummary() {
+    const editImg = document.getElementById('edit-summary-section');
+    const descriptionElem = document.getElementById('description');
+    const companyElem = document.getElementById('company');
+    const websiteElem = document.getElementById('website');
+    editImg.className = 'hidden'
+    // description
+    descriptionElem.dataset.original = descriptionElem.textContent;
+    descriptionElem.contentEditable = true;
+    descriptionElem.className = 'w-full min-h-[2.5rem] p-2 border rounded-md outline-none whitespace-pre-wrap break-words';
+
+    //company
+    companyElem.dataset.original = companyElem.textContent;
+    companyElem.contentEditable = true;
+    companyElem.className = 'text-wrap break-words font-light border mb-2 p-2 rounded'
+
+    //website
+    websiteElem.dataset.original = websiteElem.textContent;
+    websiteElem.contentEditable = true;
+    websiteElem.className = 'text-wrap break-words font-light border mb-2 p-2 rounded';
+    document.getElementById('summaryActions').classList.remove('hidden');
+}
+
+export function cancelRecruiterSummary() {
+    const editImg = document.getElementById('edit-summary-section');
+    const descriptionElem = document.getElementById('description');
+    const companyElem = document.getElementById('company');
+    const websiteElem = document.getElementById('website');    
+
+
+    editImg.className = 'inline-block h-8 align-middle'
+    // description restore
+    descriptionElem.textContent = descriptionElem.dataset.original
+    descriptionElem.contentEditable = false
+    descriptionElem.className = "font-light"
+    
+    // company restore
+    companyElem.textContent = companyElem.dataset.original
+    companyElem.contentEditable = false
+    companyElem.className = "font-light"
+
+    // website restore
+    websiteElem.textContent = websiteElem.dataset.original
+    websiteElem.contentEditable = false
+    websiteElem.className = "font-light"
+
+
+    document.getElementById('summaryActions').classList.add('hidden');
+}
+
+export function updateRecruiterSummary(data) {
+    const editImg = document.getElementById('edit-summary-section');
+    const descriptionElem = document.getElementById('description');
+    const companyElem = document.getElementById('company');
+    const websiteElem = document.getElementById('website');    
+
+
+    editImg.className = 'inline-block h-8 align-middle'
+    // description update
+    descriptionElem.textContent = data.description
+    descriptionElem.contentEditable = false
+    descriptionElem.className = "font-light"
+    
+    // company update
+    companyElem.textContent = data.company;
+    companyElem.contentEditable = false
+    companyElem.className = "font-light"
+
+    // website update
+    websiteElem.textContent = data.website;
+    websiteElem.contentEditable = false
+    websiteElem.className = "font-light"
+
+
+    document.getElementById('summaryActions').classList.add('hidden');
+}

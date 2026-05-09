@@ -5,11 +5,20 @@ from profiles.models import CandidateProfile
 from django.db import IntegrityError
 
 class ApplicationSerializer(serializers.ModelSerializer):
-    
+    applicant = serializers.SerializerMethodField()
+    skills = serializers.SerializerMethodField()
+
     class Meta:
         model = Application
-        fields = ['pk','job','user','status','updated_by']
-        read_only_fields = ['status','updated_by','pk','user']
+        fields = ['pk','job','user','skills','applicant','status','updated_by','created_at']
+        read_only_fields = ['status','updated_by','pk','user','applicant','created_at','skills']
+
+    def get_applicant(self,obj):
+        return obj.user.username
+    
+    def get_skills(self, obj):
+        profile = obj.user.candidate_profile
+        return profile.skills.values_list('name', flat=True)
 
     def validate(self, attrs):
         user = self.context['request'].user
@@ -47,8 +56,8 @@ class ApplicationStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Application
-        fields = ['job','user','status', 'updated_by']
-        read_only_fields = ['job', 'user', 'updated_by']
+        fields = ['pk','job','user','status', 'updated_by']
+        read_only_fields = ['pk','job', 'user', 'updated_by']
 
     def update(self, instance, validated_data):
         # pen -> view -> shl or pen - vew -> rej

@@ -245,9 +245,9 @@ class ApplicationTests(ApplicationTestSetUp):
         url = reverse('application-detail', kwargs={'pk':application.id})
 
         self.status_transition_invalid_request(url,Application.PENDING)
-        self.status_transition_invalid_request(url,Application.REJECTED)
         self.status_transition_invalid_request(url,Application.SHORTLISTED)
-        self.status_transition_valid_request(url,Application.VIEWED)
+        self.status_transition_valid_request(url,Application.REJECTED)
+        self.status_transition_invalid_request(url,Application.VIEWED)
     
     def test_update_application_transition_from_viewed(self):
         """

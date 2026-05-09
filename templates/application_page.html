@@ -1,0 +1,57 @@
+{% extends './base.html' %}
+{% load static %}
+{% block title %}
+<title>CareerZ: Applications</title>
+{% endblock %}
+
+{% block main %}
+<main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6">
+
+    <section aria-labelledby="applications-heading">
+
+        <header class="mb-6">
+            <h1 id="applications-heading" data-jobid="{{ job_id }}"
+                class="text-2xl font-bold text-gray-800">
+                Applications
+            </h1>
+        </header>
+
+        <div id="applications-container"
+             class="grid gap-4">
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- Modal -->
+<div id="modal"
+     class="fixed inset-0 hidden bg-black/50 z-50 flex items-center justify-center p-4">
+
+    <section
+        class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+
+        <header class="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+
+            <h2 class="text-lg font-semibold">
+                Applicant Profile
+            </h2>
+
+            <button id="btn-modal-close">
+                <img class="h-5 cursor-pointer"
+                     src="{% static 'image/cross.png' %}">
+            </button>
+
+        </header>
+
+        <div id="modalContent" class="p-6"></div>
+
+    </section>
+
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="module" src="{% static 'js/applications.js' %}"></script>
+{% endblock %}

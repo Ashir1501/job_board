@@ -230,3 +230,25 @@ class RecruiterSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+
+class ApplicantProfileSerializer(serializers.ModelSerializer):
+
+    work_experience = WorkExperienceSerializer(many=True)
+    educations = EducationSerializer(many=True)
+    projects = ProjectSerializer(many=True)
+
+    skills = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CandidateProfile
+        fields = [
+            'summary',
+            'resume',
+            'skills',
+            'work_experience',
+            'educations',
+            'projects',
+        ]
+
+    def get_skills(self, obj):
+        return obj.skills.values_list('name', flat=True)

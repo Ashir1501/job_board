@@ -1,5 +1,5 @@
 import { bookmarkedJobs, appliedJobs } from "./api/job_api.js";
-import renderJobs from "./ui/job_render.js";
+import { renderJobs } from "./ui/job_render.js";
 import { messageBox } from "./ui/main_render.js";
 
 document.addEventListener('DOMContentLoaded', async function(){

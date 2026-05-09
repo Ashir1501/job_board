@@ -34,7 +34,7 @@ class Application(models.Model):
         ]
     
     ALLOWED_TRANSITIONS = {
-        PENDING: [VIEWED],
+        PENDING: [VIEWED, REJECTED],
         VIEWED: [SHORTLISTED, REJECTED],
         SHORTLISTED: [],
         REJECTED: []

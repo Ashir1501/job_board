@@ -25,6 +25,7 @@ class JobSerializer(serializers.ModelSerializer):
         slug_field='username'
         )
     application_status = serializers.SerializerMethodField()
+    application_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Job
@@ -34,6 +35,7 @@ class JobSerializer(serializers.ModelSerializer):
             'job_type',
             'description',
             'application_status',
+            'application_count',
             'description_html',
             'locations', 
             'salary_min', 
@@ -44,10 +46,21 @@ class JobSerializer(serializers.ModelSerializer):
             'bookmark_id',
             'is_active',
             'created_by',
-            'updated_by'
+            'created_at',
+            'updated_by',
+            'updated_at',
         ]
-        read_only_fields = ['pk','created_by','description_html','updated_by','application_status']
-        extra_kwargs = {'description':{'write_only':True}}
+        read_only_fields = [
+            'pk',
+            'created_by',
+            'description_html',
+            'updated_by',
+            'application_status',
+            'application_count',
+            'created_at',
+            'updated_at',
+            ]
+        # extra_kwargs = {'description':{'write_only':True}}
 
     def get_is_bookmarked(self, obj):
         user = self.context['request'].user
@@ -65,6 +78,12 @@ class JobSerializer(serializers.ModelSerializer):
         if app:
             return app[0].status
         return None
+
+    def get_application_count(self, obj):
+        count = getattr(obj, 'application_count', None)
+        if count:
+            return count
+        return None
     
     def validate(self, attrs):
         validate_job(attrs)
@@ -73,17 +92,17 @@ class JobSerializer(serializers.ModelSerializer):
             attrs['title'] = title.lower().strip()
         return attrs
     
-    def update(self, instance, validated_data):
-        locations = validated_data.pop('locations',None)
-        if locations is not None:
-            location_objs = get_location_obj(locations)
-            instance.locations.set(location_objs) 
+    # def update(self, instance, validated_data):
+    #     locations = validated_data.pop('locations',None)
+    #     if locations is not None:
+    #         location_objs = get_location_obj(locations)
+    #         instance.locations.set(location_objs) 
 
-        for attr, value in validated_data.items():
-            setattr(instance,attr,value)
+    #     for attr, value in validated_data.items():
+    #         setattr(instance,attr,value)
          
-        instance.save()
-        return instance
+    #     instance.save()
+    #     return instance
     
     def create(self,validated_data):
         # only create the job if the email is verified
@@ -104,6 +123,43 @@ class JobSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'non_field_errors':['Oops something went wrong!']})
             
         return job
+
+class JobUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = [
+            'pk',
+            'title', 
+            'job_type',
+            'description',
+            'description_html',
+            'locations', 
+            'salary_min', 
+            'salary_max',
+            'experience_min',
+            'experience_max',
+            'is_active',
+            'created_by',
+            'created_at',
+            'updated_by',
+            'updated_at'
+        ]
+        read_only_fields = [
+            'pk',
+            'title', 
+            'job_type',
+            'description_html',
+            'locations', 
+            'salary_min', 
+            'salary_max',
+            'experience_min',
+            'experience_max',
+            'created_by',
+            'created_at',
+            'updated_by',
+            'updated_at'
+        ]
+    
 
 class BookmarkSerializer(serializers.ModelSerializer):
     job = serializers.PrimaryKeyRelatedField(queryset=Job.objects.all())

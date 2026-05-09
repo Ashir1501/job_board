@@ -25,14 +25,14 @@
         <nav class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="{% url 'home' %}" class="block text-xl font-bold text-blue-600">CareerZ</a>
             <div class="flex items-center gap-6 text-sm font-medium text-gray-700">
-                <a href="{% url 'my_jobs' %}" class="hover:text-blue-600">My Jobs</a>
                 {% if request.user.role == 'CA' %}
-                <a href="{% url 'candidate_profile' %}" class="hover:text-blue-600">Profile</a>
+                <a href="{% url 'my_jobs' %}" class="hover:text-blue-600">My Jobs</a>
                 {% endif %}
                 {% if request.user.role == 'RE' %}
-                <a href="#" class="hover:text-blue-600">Profile</a>
+                <a href="{% url 'create_job' %}" class="hover:text-blue-600">Create Job</a>
                 {% endif %}
-                <span class="font-semibold">{{ username }}</span>
+                <a href="{% url 'profile' %}" class="hover:text-blue-600">Profile</a>
+                <span data-user-r="{{ request.user.role }}" class="font-semibold">{{ username }}</span>
             </div>
         </nav>
     </header>
@@ -48,7 +48,7 @@
         </div>
     </footer>
     <!-- Modal message -->               
-    <div id="message" class="relative hidden">
+    <div id="message" class="relative hidden z-60">
         <div class="fixed top-[5%] left-[20%] p-6 border-2 rounded w-[60%] md:w-[60%]">
             <div id="messageContent" class="flex flex-wrap gap-2"></div>
         </div>
@@ -56,6 +56,31 @@
     <script type="module" src="{% static 'js/main.js' %}"></script>
     {% block script %}
     {% endblock %}
+
+    <div id="modal"
+        class="fixed inset-0 hidden bg-black/50 z-50 flex items-center justify-center p-4">
+
+        <section
+            class="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+
+            <header class="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+
+                <h2 class="text-lg font-semibold">
+                    Edit Job
+                </h2>
+
+                <button id="btn-modal-close">
+                    <img class="h-5 cursor-pointer"
+                        src="{% static 'image/cross.png' %}">
+                </button>
+
+            </header>
+
+            <div id="modalContent" class="p-6"></div>
+
+        </section>
+
+    </div>
 </body>
 
 </html>
