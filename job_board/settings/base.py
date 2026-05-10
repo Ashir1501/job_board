@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'profiles',
     'applications',
     'jobs',
-    'analytics',
     'appui',
 
     # Third Party

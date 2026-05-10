@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import User
 from dj_rest_auth.registration.serializers import RegisterSerializer
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from functools import partial
 from profiles.service import create_profile
 
@@ -37,8 +37,10 @@ class UserSerializer(serializers.ModelSerializer):
             validated_data['email'] = validated_data.get('email').lower()
         
         validated_data.pop('re_password', None)
-        user = super().update(instance, validated_data)
-
+        try:
+            user = super().update(instance, validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError({'email':['User with this email already exists.']})
         if password:
             user.set_password(password)
             user.save()
@@ -76,7 +78,10 @@ class UserRegisterSerializer(serializers.ModelSerializer, RegisterSerializer):
             base_username = f"{base_username}{counter}"
             counter+=1
         validated_data['username'] = base_username
-        user = User.objects.create_user(**validated_data)
+        try:
+            user = User.objects.create_user(**validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError({'email':['User with this email already exists.']})
         transaction.on_commit(partial(create_profile, pk=user.pk))
         return user
     

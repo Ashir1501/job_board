@@ -24,21 +24,42 @@ export function renderJobs(container, data) {
             description_html: job.description_html
         })
 
-        const location = job.locations?.[0]
-            ? `${capitalize(job.locations[0].city)}, ${capitalize(job.locations[0].country)}`
-            : 'N/A';
+        // const location = job.locations?.[0]
+        //     ? `${capitalize(job.locations[0].city)}, ${capitalize(job.locations[0].country)}`
+        //     : 'N/A';
+        let locations = []
+        job.locations.forEach(location => {
+            if(location){
+                locations.push(capitalize(location.city))
+            }
+        });
 
         const article = document.createElement('article');
         article.id = 'article-' + job.pk;
         article.className =
             'cursor-pointer bg-white p-4 rounded-xl shadow hover:shadow-md';
+        
+        let locationsHTML = ''
+        if(locations.length > 1){
+            locationsHTML = `
+            <div>
+                <span class='inline-block text-sm text-gray-500 mr-1'>${locations[0]}</span><span class='inline-block text-sm text-gray-500'>...and More</span>
+            </div>`
+        }else if(locations.length == 1){
+            locationsHTML = `
+            <div>
+                <span class='inline-block text-sm text-gray-500 mr-1'>${locations[0]}</span>
+            </div>`
+        }
 
         article.innerHTML = `
         <h3 class="font-semibold text-lg capitalize">${job.title}</h3>
-        <p class="text-sm text-gray-600 capitalize">${job.created_by}</p>
-        <p class="text-sm text-gray-500">${location}</p>
+        <p class="text-sm text-gray-600 capitalize">${job.company}</p>
+        <div class='flex flex-wrap gap-2'>
+        ${locationsHTML}
+        </div>
         <p class="text-xs text-gray-400 mt-1">
-          ₹${job.salary_min} - ₹${job.salary_max} • ${job.experience_min}-${job.experience_max} yrs
+          ₹${job.salary_min || 0} - ₹${job.salary_max || 0} • ${job.experience_min}-${job.experience_max} yrs
         </p>
       `;
         if (job.application_status) {
@@ -70,7 +91,7 @@ export function renderJobs(container, data) {
                 container,
                 article,
                 job,
-                location
+                locations
             );
         });
         let bookmark_data = {
@@ -101,7 +122,7 @@ export function renderJobs(container, data) {
 
 }
 
-function selectJob(container, article,job, location) {
+function selectJob(container, article,job, locations) {
     const detailIdName = container.id + 'jobDetail'
     const detail = document.querySelector(`#${detailIdName}`);
     const bookmarkWhite = document.getElementById('grab_bookmark_white')
@@ -148,10 +169,26 @@ function selectJob(container, article,job, location) {
         `
     }
 
+    let locationsHTML = ''
+    if(locations.length >= 1){
+        locations.forEach(location => {
+            locationsHTML = locationsHTML + `
+            <div>
+                <span class='inline-block text-sm text-gray-500'>${location}</span>
+            </div>
+            `
+        });
+    }
+
     detail.innerHTML = detail.innerHTML + `
-        <p class="text-gray-700 mb-1">${job.company}</p>
-        <p class="text-gray-500 mb-4">${location}</p>
+        <p class="text-gray-700 mb-1">${job.company || 'Company Not Available'}</p>
+        <div class='flex flex-wrap gap-2'>
+        ${locationsHTML}
+        </div>
         <div id='description-plain' data-descriptionmk='${jobStateData.description}' class="text-gray-600">${jobStateData.description_html}</div>
+        <div class='mt-2'>
+            <span class='text-sm font-light'>Recruiter: ${job.created_by}</span>
+        </div>
     `;
 
     // create and delete bookmarks
@@ -468,7 +505,7 @@ export function escapeHtml(text) {
         .replace(/'/g, '&#039;');
 }
 
-export function updatePreview(){
+export function updatePreview() {
 
     const textarea =
         document.getElementById('markdown-input')
@@ -479,31 +516,39 @@ export function updatePreview(){
     let text = escapeHtml(textarea.value)
 
     text = text
-        .replace(/\n/g, '<br>')
+
+        // headings
+        .replace(/^### (.*?)$/gm,
+            '<h3 class="text-lg font-semibold">$1</h3>')
+
+        .replace(/^## (.*?)$/gm,
+            '<h2 class="text-xl font-semibold">$1</h2>')
+
+        .replace(/^# (.*?)$/gm,
+            '<h1 class="text-2xl font-bold">$1</h1>')
+
+        // bold
         .replace(/\*\*(.*?)\*\*/g,
             '<strong class="font-bold">$1</strong>')
 
+        // italic
         .replace(/\*(.*?)\*/g,
             '<em class="italic">$1</em>')
 
-        .replace(/^### (.*?)$/gm,
-            '<h3 class="text-lg">$1</h3>')
+        // unordered lists
+        .replace(/(?:^|\n)- (.*?)(?=\n|$)/g,
+            '<li class="list-disc ml-6">$1</li>')
 
-        .replace(/^## (.*?)$/gm,
-            '<h2 class="text-xl">$1</h2>')
+        // wrap consecutive <li> in <ul>
+        .replace(/(<li.*?<\/li>)/gs,
+            '<ul>$1</ul>')
 
-        .replace(/^# (.*?)$/gm,
-            '<h1 class="text-2xl">$1</h1>')
-
-
-        .replace(/- (.*?)(<br>|$)/g,
-             '<li class="list-disc">$1</li>')
-
-        .replace(/\d\. (.*?)(<br>|$)/g,
-             '<li class="list-decimal">$1</li>')
-
+        // links
         .replace(/\[(.*?)\]\((.*?)\)/g,
-             '<a class="underline text-blue-500" href="$2" target="_blank">$1</a>');
+            '<a class="underline text-blue-500" href="$2" target="_blank">$1</a>')
+
+        // line breaks
+        .replace(/\n/g, '<br>');
 
     preview.innerHTML = text
 }

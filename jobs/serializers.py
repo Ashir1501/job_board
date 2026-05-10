@@ -26,12 +26,14 @@ class JobSerializer(serializers.ModelSerializer):
         )
     application_status = serializers.SerializerMethodField()
     application_count = serializers.SerializerMethodField()
+    company = serializers.SerializerMethodField()
 
     class Meta:
         model = Job
         fields = [
             'pk',
             'title', 
+            'company',
             'job_type',
             'description',
             'application_status',
@@ -53,6 +55,7 @@ class JobSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'pk',
             'created_by',
+            'company',
             'description_html',
             'updated_by',
             'application_status',
@@ -60,11 +63,20 @@ class JobSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             ]
-        # extra_kwargs = {'description':{'write_only':True}}
+        extra_kwargs = {
+            'salary_min':{'allow_null':True,'required':False},
+            'salary_max': {'allow_null':True,'required':False}
+        }
 
     def get_is_bookmarked(self, obj):
         user = self.context['request'].user
         return user.bookmarks.filter(job=obj).exists()
+    
+    def get_company(self,obj):
+        print('get company',obj.created_by)
+        profile = obj.created_by.recruiter_profile
+        return profile.company
+
     
     def get_bookmark_id(self,obj):
         user = self.context['request'].user

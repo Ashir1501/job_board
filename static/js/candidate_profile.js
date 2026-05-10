@@ -26,6 +26,7 @@ import {
 } from "./api/profile_api.js";
 
 import { messageBox } from "./ui/main_render.js";
+import { logoutAPI } from "./api/account_logout.js";
 
 document.addEventListener('DOMContentLoaded',function(){
     const verifyLink = document.querySelector('#verify-link');
@@ -57,9 +58,7 @@ document.addEventListener('click',async function(event){
     const logoutBtn = document.getElementById('logout-btn');
 
     if(logoutBtn && logoutBtn.contains(event.target)){
-        let response = await fetch('/auth-api/dj-rest-auth/logout/',{
-            method:'POST',
-        })
+        let response = await logoutAPI();
         if(response.ok){
             window.location.href = '/'
         }else{

@@ -5,6 +5,7 @@ import {
     cancelRecruiterSummary, 
     updateRecruiterSummary } from "./ui/profile_render.js";
 import { updateRecruiterProfileAPI } from "./api/profile_api.js";
+import { logoutAPI } from "./api/account_logout.js";
 
 document.addEventListener('DOMContentLoaded',function(){
     const verifyLink = document.querySelector('#verify-link');
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded',function(){
     
 });
 
-document.addEventListener('click', async function(){
+document.addEventListener('click', async function(event){
     const summaryCancelElem = document.getElementById('btn-cancel-sec-summary')
     const editImg = document.getElementById('edit-summary-section')
     const logoutBtn = document.getElementById('logout-btn');
@@ -33,9 +34,7 @@ document.addEventListener('click', async function(){
     const saveSummaryBtn = document.getElementById('btn-save-sec-summary');
 
     if(logoutBtn && logoutBtn.contains(event.target)){
-        let response = await fetch('/auth-api/dj-rest-auth/logout/',{
-            method:'POST',
-        })
+        let response = await logoutAPI();
         if(response.ok){
             window.location.href = '/'
         }else{

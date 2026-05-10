@@ -329,6 +329,12 @@
   .mt-6 {
     margin-top: calc(var(--spacing) * 6);
   }
+  .mt-8 {
+    margin-top: calc(var(--spacing) * 8);
+  }
+  .mr-1 {
+    margin-right: calc(var(--spacing) * 1);
+  }
   .mr-2 {
     margin-right: calc(var(--spacing) * 2);
   }
@@ -352,6 +358,9 @@
   }
   .mb-6 {
     margin-bottom: calc(var(--spacing) * 6);
+  }
+  .ml-6 {
+    margin-left: calc(var(--spacing) * 6);
   }
   .block {
     display: block;
@@ -460,9 +469,6 @@
   }
   .resize-none {
     resize: none;
-  }
-  .list-decimal {
-    list-style-type: decimal;
   }
   .list-disc {
     list-style-type: disc;

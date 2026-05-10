@@ -1,3 +1,4 @@
+import { getCookie } from "../main.js";
 
 export default async function jobFilter(formElem){
     let formData = new FormData(formElem);
@@ -36,6 +37,7 @@ export async function appliedJobs(){
 }
 
 export async function createJob(formEle){
+    const csrftoken = getCookie('csrftoken');
     const endpoint = '/job-api/jobs/'
     const formData = new FormData(formEle)
     const jobData = {
@@ -43,15 +45,16 @@ export async function createJob(formEle){
         'job_type': formData.get('job_type'),
         'description': formData.get('description'),
         'locations': JSON.parse(formData.get('locations')),
-        'salary_min': formData.get('salary_min'),
-        'salary_max': formData.get('salary_max'),
-        'experience_min': formData.get('experience_min'),
-        'experience_max': formData.get('experience_max')
+        'salary_min': formData.get('salary_min') || null,
+        'salary_max': formData.get('salary_max') || null,
+        'experience_min': formData.get('experience_min') || null,
+        'experience_max': formData.get('experience_max') || null
     }
     let response = await fetch(endpoint,{
         method: 'POST',
         headers: {
-            'Content-Type':'application/json;charset=utf-8'
+            'Content-Type':'application/json;charset=utf-8',
+            'X-CSRFToken': csrftoken
         },
         body: JSON.stringify(jobData)
     });
@@ -59,12 +62,14 @@ export async function createJob(formEle){
 }
 
 export async function updateJobAPI(data){
+    const csrftoken = getCookie('csrftoken');
     let response = await fetch(
         `/job-api/jobs/${data.jobId}/`,
         {
             method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json;charser=utf-8'
+                'Content-Type': 'application/json;charser=utf-8',
+                'X-CSRFToken': csrftoken
             },
             body: JSON.stringify({
                 description: data.description,

@@ -14,6 +14,27 @@ import { bookmarkedJobs, appliedJobs, updateJobAPI } from './api/job_api.js';
 import { messageBox } from './ui/main_render.js';
 import { openModal, closeModal } from './ui/profile_render.js';
 
+export function getCookie(name) {
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(
+                    cookie.substring(name.length + 1)
+                );
+                break;
+            }
+        }
+    }
+
+    return cookieValue;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // password toggle
@@ -106,7 +127,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 let data = await response.json()
                 console.log(data)
                 const container = document.getElementById('jobList');
-                renderJobs(container, data)
+                if(data.count == 0){
+                    container.innerHTML = `
+                    <div class='mt-8'>
+                        <span class='text-center text-xl text-semibold'>No Jobs Available</span>
+                    </div>
+                    `
+                }else{
+                    renderJobs(container, data)
+                }
 
             } else {
                 let err = await response.json()
@@ -205,34 +234,35 @@ document.addEventListener('click',async function (event) {
 
     const descriptionPlain = document.querySelector('#description-plain');
     if(descriptionPlain){
-        const listElem = descriptionPlain.querySelector('ul')
-        if(listElem){
-            listElem.className = 'list-disc'
-        }
-        const heading1 = descriptionPlain.querySelector('h1')
-        if(heading1){
-            heading1.className = 'text-2xl'
-        }
-        const heading2 = descriptionPlain.querySelector('h2')
-        if(heading2){
-            heading2.className = 'text-xl'
-        }
-        const heading3 = descriptionPlain.querySelector('h3')
-        if(heading3){
-            heading3.className = 'text-lg'
-        }
-        const strongElem = descriptionPlain.querySelector('strong');
-        if(strongElem){
-            strongElem.className = 'font-bold'
-        }
-        const italicElem = descriptionPlain.querySelector('em')
-        if(italicElem){
-            italicElem.className = 'italic';
-        }
-        const anchorElem = descriptionPlain.querySelector('a');
-        if(anchorElem){
-            anchorElem.className = 'underline text-blue-500'
-        }
+        const listElems = descriptionPlain.querySelectorAll('ul')
+        listElems.forEach(elem => {
+            elem.className = 'list-disc'
+        });
+        const heading1 = descriptionPlain.querySelectorAll('h1')
+        heading1.forEach(elem=>{
+            elem.className = 'text-2xl font-bold'
+        });
+        const heading2 = descriptionPlain.querySelectorAll('h2')
+        heading2.forEach(elem=>{
+            elem.className = 'text-xl font-semibold'
+        });
+        const heading3 = descriptionPlain.querySelectorAll('h3')
+        heading3.forEach(elem=>{
+            elem.className = 'text-lg font-semibold'
+        });
+        const strongElem = descriptionPlain.querySelectorAll('strong');
+        strongElem.forEach(elem=>{
+            elem.className = 'font-bold'
+        });
+        const italicElem = descriptionPlain.querySelectorAll('em')
+        italicElem.forEach(elem=>{
+            elem.className = 'italic';
+        });
+        const anchorElem = descriptionPlain.querySelectorAll('a');
+        anchorElem.forEach(elem=>{
+            elem.className = 'underline text-blue-500'
+
+        });
     }
 
     const closeModalBtn = document.getElementById('btn-modal-close');

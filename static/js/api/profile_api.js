@@ -1,7 +1,9 @@
 import { closeModal } from "../ui/profile_render.js";
 import { messageBox } from "../ui/main_render.js";
+import { getCookie } from "../main.js";
 
 export async function updateProfileAPI(data){
+    const csrftoken = getCookie('csrftoken');
     const endpoint = '/profile-api/candidates/0/';
 
     if(data.resume){
@@ -14,6 +16,9 @@ export async function updateProfileAPI(data){
 
         let response = await fetch(endpoint,{
             method: 'PATCH',
+            headers:{
+                'X-CSRFToken': csrftoken
+            },
             body: formData
         })
         return response
@@ -25,7 +30,8 @@ export async function updateProfileAPI(data){
         let response = await fetch(endpoint,{
             method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json;charset=utf-8'
+                'Content-Type': 'application/json;charset=utf-8',
+                'X-CSRFToken': csrftoken
             },
             body: bodyData
         })
@@ -35,22 +41,34 @@ export async function updateProfileAPI(data){
 
 
 export async function deleteWorkExp(pk){
+    const csrftoken = getCookie('csrftoken');
     const response = await fetch(`/profile-api/candidates/0/workexp/${pk}/`, {
         method: 'DELETE',
+        headers:{
+            'X-CSRFToken': csrftoken
+        }
     });
     return response;
 }
 
 export async function deleteProject(pk){
+    const csrftoken = getCookie('csrftoken');
     const response = await fetch(`/profile-api/candidates/0/projects/${pk}/`, {
         method: 'DELETE',
+        headers:{
+            'X-CSRFToken': csrftoken
+        }
     });
     return response;
 }
 
 export async function deleteEducation(pk){
+    const csrftoken = getCookie('csrftoken');
     const response = await fetch(`/profile-api/candidates/0/educations/${pk}/`, {
         method: 'DELETE',
+        headers: {
+            'X-CSRFToken': csrftoken
+        }
     });
     return response;
 }
@@ -58,6 +76,7 @@ export async function deleteEducation(pk){
 
 // generic submit handler
 export function attachFormHandler(config) {
+    const csrftoken = getCookie('csrftoken');
     const form = document.getElementById('dynamic-form');
 
     form.addEventListener('submit', async function (e) {
@@ -83,7 +102,8 @@ export function attachFormHandler(config) {
         const response = await fetch(config.url, {
             method: config.method,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json;charset=utf-8',
+                'X-CSRFToken': csrftoken
             },
             body: JSON.stringify(payload)
         });
@@ -105,6 +125,7 @@ export function attachFormHandler(config) {
 
 
 export async function updateRecruiterProfileAPI(data){
+    const csrftoken = getCookie('csrftoken');
     const endpoint = '/profile-api/recruiters/0/';
 
     const bodyData = JSON.stringify({
@@ -115,7 +136,8 @@ export async function updateRecruiterProfileAPI(data){
     let response = await fetch(endpoint,{
         method: 'PATCH',
         headers: {
-            'Content-Type': 'application/json;charset=utf-8'
+            'Content-Type': 'application/json;charset=utf-8',
+            'X-CSRFToken': csrftoken
         },
         body: bodyData
     })
