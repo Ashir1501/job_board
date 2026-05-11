@@ -44,7 +44,7 @@ export async function createJob(formEle){
         'title': formData.get('title'),
         'job_type': formData.get('job_type'),
         'description': formData.get('description'),
-        'locations': JSON.parse(formData.get('locations')),
+        'locations': JSON.parse(formData.get('locations') || null),
         'salary_min': formData.get('salary_min') || null,
         'salary_max': formData.get('salary_max') || null,
         'experience_min': formData.get('experience_min') || null,

@@ -54,7 +54,7 @@ export function renderJobs(container, data) {
 
         article.innerHTML = `
         <h3 class="font-semibold text-lg capitalize">${job.title}</h3>
-        <p class="text-sm text-gray-600 capitalize">${job.company}</p>
+        <p class="text-sm text-gray-600 capitalize">${job.company || 'company not specified'}</p>
         <div class='flex flex-wrap gap-2'>
         ${locationsHTML}
         </div>
