@@ -36,6 +36,9 @@ class UserSerializer(serializers.ModelSerializer):
         if email:
             validated_data['email'] = validated_data.get('email').lower()
         
+        if(User.objects.filter(email=email).exists()):
+            raise serializers.ValidationError({'email':['User with this email already exists.']})
+            
         validated_data.pop('re_password', None)
         try:
             user = super().update(instance, validated_data)
@@ -70,7 +73,10 @@ class UserRegisterSerializer(serializers.ModelSerializer, RegisterSerializer):
         
         #normailizing email before saving
         validated_data['email'] = validated_data.get('email').lower()
-
+        email = validated_data['email']
+        if(User.objects.filter(email=email).exists()):
+            raise serializers.ValidationError({'email':['User with this email already exists.']})
+        
         #populating username field
         base_username = validated_data.get('email').split('@')[0]
         counter = 0

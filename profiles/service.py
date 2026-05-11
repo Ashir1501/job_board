@@ -16,11 +16,17 @@ def create_profile(pk):
 
       if user.role == 'CA':
             from .models import CandidateProfile
-            CandidateProfile.objects.create(user=user)
+            try:
+                  CandidateProfile.objects.create(user=user)
+            except IntegrityError:
+                  raise serializers.ValidationError({'non_field_errors':['Profile already exists.']})
 
       if user.role == 'RE':
             from .models import RecruiterProfile
-            RecruiterProfile.objects.create(user=user) 
+            try:
+                  RecruiterProfile.objects.create(user=user) 
+            except IntegrityError:
+                  raise serializers.ValidationError({'non_field_errors':['Profile already exists.']})
 
 def get_skills(skills):
       skill_obj = []

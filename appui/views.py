@@ -2,7 +2,7 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from accounts.models import User
-from rest_framework.decorators import api_view, renderer_classes, permission_classes
+from rest_framework.decorators import api_view, renderer_classes, permission_classes, throttle_classes
 from django.shortcuts import redirect
 from allauth.account.admin import EmailAddress
 from profiles.serializers import WorkExperienceSerializer, ProjectSerializer, EducationSerializer
@@ -12,6 +12,7 @@ from django.views.decorators.cache import never_cache
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def home(request):
     if not request.user.is_authenticated:
         return redirect('login')
@@ -27,6 +28,7 @@ def home(request):
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def login(request):
     if(request.user.is_authenticated):
         return redirect('home')
@@ -36,6 +38,7 @@ def login(request):
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def register_view(request):
     if(request.user.is_authenticated):
         return redirect('home')
@@ -44,6 +47,7 @@ def register_view(request):
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def my_jobs_view(request):
     if request.user.is_authenticated:
         return Response({'username':request.user.username},template_name='my_jobs.html')
@@ -52,6 +56,7 @@ def my_jobs_view(request):
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
 @permission_classes([AllowAny])
+@throttle_classes([])
 def profile_view(request):
     if request.user.is_authenticated:
         # email verification data
@@ -119,6 +124,7 @@ def profile_view(request):
 
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
+@throttle_classes([])
 def create_job_view(request):
     context = {
         'username': request.user.username
@@ -127,6 +133,7 @@ def create_job_view(request):
 
 @api_view(['GET'])
 @renderer_classes([TemplateHTMLRenderer])
+@throttle_classes([])
 def application_page_view(request,job_id):
     context = {
         'username': request.user.username,

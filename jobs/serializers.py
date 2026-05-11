@@ -194,5 +194,8 @@ class BookmarkSerializer(serializers.ModelSerializer):
         if Bookmark.objects.filter(user=user,job=job).exists():
             raise serializers.ValidationError('Bookmark already exists.')
         
-        obj = Bookmark.objects.create(**validated_data)
-        return obj
+        try:
+            obj = Bookmark.objects.create(**validated_data)
+            return obj
+        except IntegrityError:
+            raise serializers.ValidationError({'non_field_errors': ['Bookmark already exists.']})

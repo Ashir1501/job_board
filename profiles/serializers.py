@@ -75,8 +75,11 @@ class CandidateSerializer(serializers.ModelSerializer):
             setattr(instance,attr,value)
 
         instance.updated_by = self.context['request'].user
-        instance.save()
-        return instance
+        try:
+            instance.save()
+            return instance
+        except IntegrityError:
+            raise serializers.ValidationError({'non_field_errors':['Profile already exists']})
     
 class WorkExperienceSerializer(serializers.ModelSerializer):
     skill_list = serializers.ListField(
@@ -227,9 +230,11 @@ class RecruiterSerializer(serializers.ModelSerializer):
         validated_data['updated_by'] = user
         for attr, value in validated_data.items():
             setattr(instance,attr,value)
-
-        instance.save()
-        return instance
+        try:
+            instance.save()
+            return instance
+        except IntegrityError:
+            raise serializers.ValidationError({'non_field_errors':['Profile already exists']})
 
 class ApplicantProfileSerializer(serializers.ModelSerializer):
 
