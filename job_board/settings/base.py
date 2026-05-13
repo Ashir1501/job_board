@@ -117,24 +117,27 @@ WSGI_APPLICATION = 'job_board.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-if DEBUG:
+
+DATABASE_URL = env("DATABASE_URL", default=None)
+
+if DATABASE_URL:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('DB_NAME'),
-            'USER': env('DB_USER'),
-            'PASSWORD': env('DB_PASSWORD'),
-            'HOST': 'db',
-            'PORT': '5432',
-        }
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True,
+        )
     }
 else:
     DATABASES = {
-        'default': dj_database_url.config(
-            default=env('DATABASE_URL',default=None),
-            conn_max_age=600,
-            ssl_require=True
-        )
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env("DB_NAME"),
+            "USER": env("DB_USER"),
+            "PASSWORD": env("DB_PASSWORD"),
+            "HOST": env("DB_HOST", default="db"),
+            "PORT": env("DB_PORT", default="5432"),
+        }
     }
 
 # Password validation
