@@ -1,3 +1,5 @@
+#!/bin/sh
+
 python manage.py migrate --noinput
 
 celery -A job_board worker -l info &
