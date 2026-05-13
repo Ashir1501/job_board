@@ -26,19 +26,24 @@ from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView
 )
+
 urlpatterns = [
-    # path('admin/', admin.site.urls),
     path('',include('appui.urls')),
     path('auth-api/',include('accounts.urls')),
     path('job-api/',include('jobs.urls')),
     path('application-api/',include('applications.urls')),
     path('profile-api/',include('profiles.urls')),
-    # path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    # path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
-    path(
-        "api/docs/",
-        SpectacularSwaggerView.as_view(url_name="api-schema"),
-        name="api-docs",
-    ),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns = urlpatterns + [
+        path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+        path(
+            "api/docs/",
+            SpectacularSwaggerView.as_view(url_name="api-schema"),
+            name="api-docs",
+        ),
+    ] 
+
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -40,4 +40,5 @@ RUN chown -R appuser:appuser /app
 USER appuser
 
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "job_board.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4"]
+# CMD ["gunicorn", "job_board.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4", "--log-level", "debug", "--access-logfile", "-", "--error-logfile", "-"]

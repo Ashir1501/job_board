@@ -59,6 +59,10 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
 
+    # Media Storage
+    'cloudinary_storage',
+    'cloudinary',
+    
     # Allauth
     'allauth',
     'allauth.account',
@@ -121,12 +125,6 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 
 # Password validation
@@ -160,14 +158,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  
-]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -206,7 +196,7 @@ REST_AUTH = {
     "JWT_AUTH_COOKIE": "access",
     "JWT_AUTH_REFRESH_COOKIE": "refresh",
     "JWT_AUTH_SECURE": True,
-    "JWT_AUTH_HTTPONLY": True,  # True is the default value
+    "JWT_AUTH_HTTPONLY": True, 
     "JWT_AUTH_SAMESITE": "Lax",
 }
 
@@ -227,7 +217,7 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
 }
 
-CSRF_COOKIE_SECURE = True        # HTTPS only
+
 CSRF_COOKIE_HTTPONLY = False     # can be accessed by ajax request
 
 # django-allauth configurations so that dj-rest-auth uses email for
@@ -244,9 +234,6 @@ ACCOUNT_EMAIL_VERIFICATION = "optional"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_ADAPTER = 'accounts.adapters.MyAccountAdapter'
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_HOST = env('EMAIL_HOST')
-EMAIL_PORT = env('EMAIL_PORT')
 SITE_ID = 1
 
 CELERY_BROKER_URL = env('CELERY_BROKER_URL') # redis url

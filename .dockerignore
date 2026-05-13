@@ -1,0 +1,36 @@
+# git
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+
+# Environment variables / secrets
+.env
+.env.*
+
+# Django stuff
+db.sqlite3
+media/
+staticfiles/
+
+# Logs
+*.log
+
+# Node stuff (if using frontend tooling)
+node_modules/
+
+# Docker
+docker-compose.yml
+
+# Documentation / misc
+README.md
+
+# Build artifacts
+dist/
+build/

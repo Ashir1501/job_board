@@ -9,6 +9,7 @@ from .models import (
 from .service import validate_start_end_date, get_skills
 import filetype
 from django.db import IntegrityError
+import os
 
 class CandidateSerializer(serializers.ModelSerializer):
     resume = serializers.FileField(required=False)
@@ -31,7 +32,8 @@ class CandidateSerializer(serializers.ModelSerializer):
 
     def get_resume_name(self,obj):
         if obj.resume:
-            return obj.resume.name.split('/')[2]
+            # return obj.resume.name.split('/')[2]
+            return os.path.basename(obj.resume.name)
         return None
 
     def get_resume_url(self,obj):
@@ -41,23 +43,33 @@ class CandidateSerializer(serializers.ModelSerializer):
 
     def validate_resume(self,value):
         file = value
-        if file is None or file == '':
+        if not file:
             return None
         
         if file.size > 2 * 1024 * 1024:
             raise serializers.ValidationError('File size should be under 2MB.')
         
-        # pdf files always starts with %PDF-
-        file.seek(0)
-        if file.read(5) != b'%PDF-':
-            raise serializers.ValidationError("Invalid PDF file.")
-        file.seek(0)
+        try:
+            # pdf files always starts with %PDF-
+            file.seek(0)
+            header = file.read(5)
 
-        kind = filetype.guess(file.read(2048))
-        if not kind or kind.mime != 'application/pdf':
-            raise serializers.ValidationError("Invalid PDF file.")
-        file.seek(0)
-        return value
+            if header != b'%PDF-':
+                raise serializers.ValidationError("Invalid PDF file.")
+            file.seek(0)
+
+            sample = file.read(2048)
+
+            kind = filetype.guess(sample)
+
+            if not kind or kind.mime != 'application/pdf':
+                raise serializers.ValidationError("Invalid PDF file.")
+            file.seek(0)
+            return value
+        except Exception as e:
+            raise serializers.ValidationError({
+                'non_field_errors': f'PDF validation failed: {str(e)}'
+            })
     
     def validate_summary(self,value):
         if value:

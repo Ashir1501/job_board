@@ -4,6 +4,7 @@ from .models import Application
 from django.core import mail
 from celery import shared_task
 from django.db import close_old_connections
+from django.conf import settings
 
 @shared_task(rate_limit='10/m',bind=True, autoretry_for=(Exception,), retry_backoff=True, retry_kwargs={'max_retries': 5})
 def new_application_mailer_task(self,pk):
@@ -38,9 +39,8 @@ def new_application_mailer_task(self,pk):
     msg_ca = EmailMultiAlternatives(
         subject=f"Application for {title}",
         body=text_content_ca,
-        from_email='support@carrierhai.com',
+        from_email=settings.EMAIL_SENDER,
         to=[candidate_email],
-        headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
     )
 
     # Lastly, attach the HTML content to the email instance and send.
@@ -68,7 +68,7 @@ def new_application_mailer_task(self,pk):
     msg_re = EmailMultiAlternatives(
         subject=f"New Applicant for {title}",
         body=text_content_re,
-        from_email="support@carrierhai.com",
+        from_email=settings.EMAIL_SENDER,
         to=[recruiter_email],
         headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
     )
@@ -109,7 +109,7 @@ def application_status_mailer_task(self,pk):
     msg_ca = EmailMultiAlternatives(
         subject=f"Application for {title}",
         body=text_content_ca,
-        from_email='support@carrierhai.com',
+        from_email=settings.EMAIL_SENDER,
         to=[candidate_email],
         headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
     )

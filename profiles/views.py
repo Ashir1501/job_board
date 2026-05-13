@@ -1,5 +1,5 @@
 from rest_framework import viewsets, mixins, permissions
-from rest_framework.parsers import MultiPartParser, JSONParser
+from rest_framework.parsers import MultiPartParser, JSONParser, FormParser
 from .serializers import (
     CandidateSerializer,
     RecruiterSerializer,
@@ -31,7 +31,7 @@ class RetrieveUpdateViewSet(
 class CandidateProfileViewSet(RetrieveUpdateViewSet):
     serializer_class = CandidateSerializer
     permission_classes = [permissions.IsAuthenticated, IsCandidate]
-    parser_classes = [MultiPartParser, JSONParser]             
+    parser_classes = [MultiPartParser,FormParser, JSONParser]             
 
     def get_queryset(self):
         return CandidateProfile.objects.filter(user=self.request.user)

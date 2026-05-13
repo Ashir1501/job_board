@@ -3,9 +3,11 @@ __pycache__/
 
 # Environments
 venv/
-.env 
+.env
+
 db.sqlite3
 media/
+staticfiles/
 
 #node / tailwind
 node_modules/

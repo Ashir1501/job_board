@@ -73,7 +73,6 @@ class JobSerializer(serializers.ModelSerializer):
         return user.bookmarks.filter(job=obj).exists()
     
     def get_company(self,obj):
-        print('get company',obj.created_by)
         profile = obj.created_by.recruiter_profile
         return profile.company
 
