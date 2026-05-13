@@ -1,22 +1,19 @@
 #stage1: Build Tailwind with Node
 FROM node:24.13.1 AS frontend
 
-WORKDIR /app
-
-COPY frontend/package*.json ./frontend/
-
 WORKDIR /app/frontend
+
+COPY frontend/package*.json ./
 RUN npm install
 
-WORKDIR /app
-COPY . .
-
-
-WORKDIR /app/frontend
+COPY frontend .
 RUN npx @tailwindcss/cli -i ./src/input.css -o ../static/css/output.css --minify
 
 #stage2: Django App
 FROM python:3.8-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
@@ -35,10 +32,12 @@ RUN mkdir -p /app/static/css
 # Copy built CSS from Node stage
 COPY --from=frontend /app/static/css/output.css /app/static/css/output.css
 
+RUN chmod +x start.sh
+
+RUN python manage.py collectstatic --noinput
+
 # Give ownership to user
 RUN chown -R appuser:appuser /app
 USER appuser
 
-
-CMD ["gunicorn", "job_board.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4"]
-# CMD ["gunicorn", "job_board.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "4", "--log-level", "debug", "--access-logfile", "-", "--error-logfile", "-"]
+CMD ["./start.sh"]

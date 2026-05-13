@@ -14,6 +14,7 @@ from pathlib import Path
 import environ
 import os
 from datetime import timedelta
+import dj_database_url
 
 env = environ.Env(
     DEBUG = (bool, False),
@@ -23,13 +24,13 @@ env = environ.Env(
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Take environment variables from .env file
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = env('SECRET_KEY',default='unsafe-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
@@ -115,17 +116,25 @@ WSGI_APPLICATION = 'job_board.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': 'db',
-        'PORT': '5432',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME'),
+            'USER': env('DB_USER'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': 'db',
+            'PORT': '5432',
+        }
     }
-}
-
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=env('DATABASE_URL',default=None),
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -201,7 +210,7 @@ REST_AUTH = {
 }
 
 SIMPLE_JWT = {
-    'SIGNING_KEY': env('JWT_SIGNING_KEY'),
+    'SIGNING_KEY': env('JWT_SIGNING_KEY',default='some-unsafe-signing-key'),
     'ALGORITHM': 'HS256',
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
@@ -236,10 +245,12 @@ ACCOUNT_ADAPTER = 'accounts.adapters.MyAccountAdapter'
 
 SITE_ID = 1
 
-CELERY_BROKER_URL = env('CELERY_BROKER_URL') # redis url
-CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND') # to access result from tasks
+CELERY_BROKER_URL = env('CELERY_BROKER_URL',default='some-redis-url') # redis url
+CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND',default='same-as-some-redis-url') # to access result from tasks
 CELERY_TIMEZONE = 'UTC'
 CELERY_TASK_ALWAYS_EAGER = False # Task execution behavior async - normal
 CELERY_TASK_ACKS_LATE = True #Retry behavior
 CELERY_ACCEPT_CONTENT = ['json'] # celary sends data over network 
-CELERY_TASK_SERIALIZER = 'json'  # so serializing it 
+CELERY_TASK_SERIALIZER = 'json'  # so serializing it
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
