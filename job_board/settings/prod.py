@@ -22,7 +22,7 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.RawMediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
@@ -36,11 +36,12 @@ CSRF_COOKIE_SECURE = True # true only when it is https
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = env('EMAIL_HOST')
-EMAIL_PORT = env.int('EMAIL_PORT')
+EMAIL_PORT = env('EMAIL_PORT')
 EMAIL_HOST_USER=env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD=env('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS=env.bool('EMAIL_USE_TLS')
 EMAIL_SENDER=env('EMAIL_SENDER')
+EMAIL_USE_SSL=env.bool('EMAIL_USE_SSL')
 
 CELERY_BROKER_USE_SSL = {
     "ssl_cert_reqs": ssl.CERT_NONE
