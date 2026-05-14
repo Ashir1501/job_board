@@ -222,7 +222,7 @@ document.addEventListener('click',async function(event){
             content = 'w-exp';
         }
         const article = document.getElementById(`${content}-${pk}`);
-        console.log(content)
+        // console.log(content)
         if(content == 'education'){
             handleDeleteEducation(pk,article); 
         }
@@ -281,7 +281,7 @@ async function handleDeleteWork(pk, article) {
         }
 
     } catch (error) {
-        console.error('Delete failed:', error);
+        console.error('Delete failed');
     }
 }
 

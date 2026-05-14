@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let response = await accountLogin(loginFormElem)
             if (response.ok) {
                 let result = await response.json();
-                console.log(result);
+                // console.log(result);
                 window.location.href = '/'
 
             } else {
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let response = await accountRegister(registerFormElem)
             if (response.ok) {
                 let result = await response.json();
-                console.log(result);
+                // console.log(result);
                 window.location.href = '/'
 
             } else {
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let response = await jobFilter(jobSearchForm);
             if (response.ok) {
                 let data = await response.json()
-                console.log(data)
+                // console.log(data)
                 const container = document.getElementById('jobList');
                 if(data.count == 0){
                     container.innerHTML = `
@@ -222,7 +222,7 @@ document.addEventListener('click',async function (event) {
             let response = await post_application(appFormEle)
             if(response.ok){
                 let result = await response.json()
-                console.log(result)
+                // console.log(result)
                 messageBox({content:'You will receive an email about this application soon.'})
             }else{
                 let err = await response.json()

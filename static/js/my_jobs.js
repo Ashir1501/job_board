@@ -76,7 +76,6 @@ async function appliedJobRequest(appliedListC, bookmarkListC){
     if(appliedResponse.ok){
         let result = await appliedResponse.json()
         appliedData = result
-        console.log(appliedData)
     }else{
         let err = await appliedResponse.json()
         console.log(err)

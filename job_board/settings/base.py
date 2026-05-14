@@ -34,7 +34,7 @@ environ.Env.read_env()
 SECRET_KEY = env('SECRET_KEY',default='unsafe-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = env.bool('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -136,7 +136,7 @@ else:
             "USER": env("DB_USER",default='postgrpass'),
             "PASSWORD": env("DB_PASSWORD",default='postgre@App'),
             "HOST": env("DB_HOST", default="db"),
-            "PORT": env("DB_PORT", default="5432"),
+            "PORT": env.int("DB_PORT", default="5432"),
         }
     }
 

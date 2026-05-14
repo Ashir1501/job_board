@@ -18,7 +18,7 @@ export async function loadApplication(endpoint){
     let response = await getApplicationAPI(endpoint);
     if(response.ok){
         let data = await response.json();
-        console.log(data)
+        // console.log(data)
         data.results.forEach(application => {
             const jsDate = new Date(application.created_at);
             applicationState.set(application.pk, {
