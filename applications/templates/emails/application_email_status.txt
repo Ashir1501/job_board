@@ -7,7 +7,7 @@ Hi {{ candidate }},
     We have decided to move forward with another candidate.
     We wish you the best of luck in your job search and future professional endeavors.
 From,
-    CarrierHai
+    CareerZ
 {% endif %}
 
 {% if status == "SHL" %}
@@ -17,5 +17,5 @@ From,
         We have decided to move forward with your application.
         We wish you the best of luck in your role and stay tuned for future updates.
     From,
-        CarrierHai
+        CareerZ
 {% endif %}

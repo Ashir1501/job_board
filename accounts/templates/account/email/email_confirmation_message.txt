@@ -1,7 +1,7 @@
-Hello from example.com!
+Hello from CareerZ!
 
 Please confirm your email by clicking the link below:
 
-http://localhost:8000/auth-api/dj-rest-auth/confirm-email/{{ key }}
+http://job-board-w7a7.onrender.com/auth-api/dj-rest-auth/confirm-email/{{ key }}
 
 Thank you!

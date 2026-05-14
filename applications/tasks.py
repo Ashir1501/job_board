@@ -70,7 +70,6 @@ def new_application_mailer_task(self,pk):
         body=text_content_re,
         from_email=settings.EMAIL_SENDER,
         to=[recruiter_email],
-        headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
     )
 
     msg_re.attach_alternative(html_content_re, "text/html")
@@ -111,7 +110,6 @@ def application_status_mailer_task(self,pk):
         body=text_content_ca,
         from_email=settings.EMAIL_SENDER,
         to=[candidate_email],
-        headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
     )
 
     msg_ca.attach_alternative(html_content_ca, "text/html")

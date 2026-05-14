@@ -30,6 +30,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = "localhost"
 EMAIL_PORT = 25
 EMAIL_SENDER = 'support@careerz.com'
+DEFAULT_FROM_EMAIL = EMAIL_SENDER
 # VERY IMPORTANT these setting will work only for default email verification
 # currently using custom email url returns json response
 # ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = ""

@@ -10,7 +10,7 @@ class MyAccountAdapter(DefaultAccountAdapter):
         on_commit(lambda: send_email_task.delay(
             msg.subject,
             msg.body,
-            msg.from_email,
+            # msg.from_email,
             [email],
             msg.alternatives  # includes your HTML email
         ))
