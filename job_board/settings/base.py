@@ -251,13 +251,6 @@ SITE_ID = 1
 
 CELERY_BROKER_URL = env('CELERY_BROKER_URL',default='some-redis-url') # redis url
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND',default='same-as-some-redis-url') # to access result from tasks
-CELERY_BROKER_USE_SSL = {
-    "ssl_cert_reqs": ssl.CERT_NONE
-}
-
-CELERY_REDIS_BACKEND_USE_SSL = {
-    "ssl_cert_reqs": ssl.CERT_NONE
-}
 CELERY_TIMEZONE = 'UTC'
 CELERY_TASK_ALWAYS_EAGER = False # Task execution behavior async - normal
 CELERY_TASK_ACKS_LATE = True #Retry behavior

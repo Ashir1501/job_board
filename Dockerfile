@@ -1,12 +1,18 @@
 #stage1: Build Tailwind with Node
 FROM node:24.13.1 AS frontend
 
-WORKDIR /app/frontend
+WORKDIR /app
 
-COPY frontend/package*.json ./
+COPY frontend/package*.json ./frontend/
+
+WORKDIR /app/frontend
 RUN npm install
 
-COPY frontend .
+WORKDIR /app
+COPY . .
+
+
+WORKDIR /app/frontend
 RUN npx @tailwindcss/cli -i ./src/input.css -o ../static/css/output.css --minify
 
 #stage2: Django App
