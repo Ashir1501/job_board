@@ -35,6 +35,9 @@ CLOUDINARY_STORAGE = {
 }
 
 CSRF_COOKIE_SECURE = True # true only when it is https 
+#makes django trust renders reverse proxy that requset is https
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_COOKIE_SAMESITE = "Lax"
 
 # render unable to send email with socket.timeout
 # EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
