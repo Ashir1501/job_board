@@ -2,6 +2,8 @@ from .base import *
 
 ALLOWED_HOSTS = ["*"]
 
+INSTALLED_APPS += ["anymail"]
+
 MIDDLEWARE.insert(1,"whitenoise.middleware.WhiteNoiseMiddleware")
 
 
@@ -34,16 +36,24 @@ CLOUDINARY_STORAGE = {
 
 CSRF_COOKIE_SECURE = True # true only when it is https 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = env('EMAIL_HOST')
-EMAIL_PORT = env.int('EMAIL_PORT')
-EMAIL_HOST_USER=env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD=env('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS=env.bool('EMAIL_USE_TLS')
-EMAIL_SENDER=env('EMAIL_SENDER')
+# render unable to send email with socket.timeout
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
+ANYMAIL = {
+    "BREVO_API_KEY": env("BREVO_API_KEY"),
+}
 DEFAULT_FROM_EMAIL = env("EMAIL_SENDER")
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
-EMAIL_USE_SSL=env.bool('EMAIL_USE_SSL')
+EMAIL_SENDER=env('EMAIL_SENDER')
+
+
+# EMAIL_HOST = env('EMAIL_HOST')
+# EMAIL_PORT = env.int('EMAIL_PORT')
+# EMAIL_HOST_USER=env('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD=env('EMAIL_HOST_PASSWORD')
+# EMAIL_USE_TLS=env.bool('EMAIL_USE_TLS')
+# EMAIL_USE_SSL=env.bool('EMAIL_USE_SSL')
+
 EMAIL_TIMEOUT = 20
 CELERY_BROKER_USE_SSL = {
     "ssl_cert_reqs": ssl.CERT_NONE
