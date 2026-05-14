@@ -96,7 +96,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (response.ok) {
                 let result = await response.json();
                 // console.log(result);
-                window.location.href = '/'
+                messageBox({content:'Verification Email will be sent shortly'})
+                setTimeout(() => {
+                    window.location.href = '/'
+                }, 2000);
 
             } else {
                 let err = await response.json();
