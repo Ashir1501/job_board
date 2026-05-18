@@ -34,7 +34,7 @@ class JobViewSet(CreateListRetrieveUpdateViewSet):
     filter_backends = [filters.DjangoFilterBackend, rest_filter.SearchFilter, rest_filter.OrderingFilter]
     filterset_class = JobFilter
     search_fields = ['title']
-    ordering_fields = ['created_at']
+    ordering_fields = ['-created_at']
 
 
     def get_queryset(self):

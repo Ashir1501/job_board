@@ -9,6 +9,7 @@ export default async function jobFilter(formElem){
 
     let response = await fetch(endpoint, {
         method:'GET',
+        credentials: 'include'
     })
     return response
 }
@@ -16,6 +17,7 @@ export default async function jobFilter(formElem){
 export async function jobFilterNav(endpoint){
     let response = await fetch(endpoint, {
         method:'GET',
+        credentials:'include'
     })
     return response
 }
@@ -23,7 +25,8 @@ export async function jobFilterNav(endpoint){
 export async function bookmarkedJobs(){
     const endpoint = '/job-api/jobs/bookmarked_jobs/'
     let response = await fetch(endpoint,{
-        method:'GET'
+        method:'GET',
+        credentials:'include'
     })
     return response
 }
@@ -31,7 +34,8 @@ export async function bookmarkedJobs(){
 export async function appliedJobs(){
     const endpoint = '/job-api/jobs/applied_jobs/'
     let response = await fetch(endpoint,{
-        method:'GET'
+        method:'GET',
+        credentials:'include'
     })
     return response
 }
@@ -52,6 +56,7 @@ export async function createJob(formEle){
     }
     let response = await fetch(endpoint,{
         method: 'POST',
+        credentials:'include',
         headers: {
             'Content-Type':'application/json;charset=utf-8',
             'X-CSRFToken': csrftoken
@@ -67,6 +72,7 @@ export async function updateJobAPI(data){
         `/job-api/jobs/${data.jobId}/`,
         {
             method: 'PATCH',
+            credentials:'include',
             headers: {
                 'Content-Type': 'application/json;charser=utf-8',
                 'X-CSRFToken': csrftoken
