@@ -16,6 +16,7 @@ export async function updateProfileAPI(data){
 
         let response = await fetch(endpoint,{
             method: 'PATCH',
+            credentials:'include',
             headers:{
                 'X-CSRFToken': csrftoken
             },
@@ -29,6 +30,7 @@ export async function updateProfileAPI(data){
         })
         let response = await fetch(endpoint,{
             method: 'PATCH',
+            credentials:'include',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8',
                 'X-CSRFToken': csrftoken
@@ -44,6 +46,7 @@ export async function deleteWorkExp(pk){
     const csrftoken = getCookie('csrftoken');
     const response = await fetch(`/profile-api/candidates/0/workexp/${pk}/`, {
         method: 'DELETE',
+        credentials: 'include',
         headers:{
             'X-CSRFToken': csrftoken
         }
@@ -55,6 +58,7 @@ export async function deleteProject(pk){
     const csrftoken = getCookie('csrftoken');
     const response = await fetch(`/profile-api/candidates/0/projects/${pk}/`, {
         method: 'DELETE',
+        credentials:'include',
         headers:{
             'X-CSRFToken': csrftoken
         }
@@ -66,6 +70,7 @@ export async function deleteEducation(pk){
     const csrftoken = getCookie('csrftoken');
     const response = await fetch(`/profile-api/candidates/0/educations/${pk}/`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
             'X-CSRFToken': csrftoken
         }
@@ -101,6 +106,7 @@ export function attachFormHandler(config) {
 
         const response = await fetch(config.url, {
             method: config.method,
+            credentials:'include',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8',
                 'X-CSRFToken': csrftoken
@@ -135,6 +141,7 @@ export async function updateRecruiterProfileAPI(data){
     })
     let response = await fetch(endpoint,{
         method: 'PATCH',
+        credentials:'include',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
             'X-CSRFToken': csrftoken

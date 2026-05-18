@@ -92,4 +92,16 @@ function renderLocations() {
 
     document.getElementById('locationsInput').value = JSON.stringify(locations);
 }
+
+
+document.addEventListener('reset', function(){
+    const jobForm = document.getElementById('jobForm');
+    const locationTags = document.getElementById('locationTags');
+    const mkPreview = document.getElementById('markdown-preview');
+    if(jobForm && event.target.contains(jobForm)){
+        locationTags.innerHTML = '';
+        mkPreview.innerHTML = '';
+        locations = []
+    }
+});
 // -----------------------------------------------------------------------------

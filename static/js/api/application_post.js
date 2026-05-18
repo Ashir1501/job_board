@@ -6,6 +6,7 @@ export default async function post_application(formEle){
   
     let response = await fetch(endpoint,{
         method: 'post',
+        credentials: 'include',
         headers: {
             'X-CSRFToken': csrftoken
         },

@@ -5,6 +5,7 @@ export default async function resendEmail(email){
     const endpoint = '/auth-api/dj-rest-auth/registration/resend-email/'
     let response = await fetch(endpoint,{
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
             'X-CSRFToken': csrftoken
