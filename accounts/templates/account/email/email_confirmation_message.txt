@@ -2,6 +2,6 @@ Hello from CareerZ!
 
 Please confirm your email by clicking the link below:
 
-http://job-board-w7a7.onrender.com/auth-api/dj-rest-auth/confirm-email/{{ key }}
+https://job-board-w7a7.onrender.com/auth-api/dj-rest-auth/confirm-email/{{ key }}
 
 Thank you!
