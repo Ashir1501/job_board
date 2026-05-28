@@ -62,8 +62,6 @@ export function cancelUpdates(summarySkills) {
     summaryElem.className = ""
 
     // resume restore
-    resumeName.textContent = resumeName.dataset.resumeName
-    resumeUrl.href = resumeUrl.dataset.resumeUrl;
     resumeName.className = 'inline-block mr-4';
     resumeUrl.className = 'inline';
 
@@ -156,7 +154,8 @@ export function saveSummary(result) {
     summaryElem.className = ""
 
     resumeName.textContent = result.resume_name;
-    resumeUrl.href = result.resume_url;
+    resumeUrl.href = result.resume_url || '#';
+    resumeUrl.dataset.resumeUrl = result.resume_url || '#'
     resumeName.className = 'inline-block mr-4';
     resumeUrl.className = 'inline';
 

@@ -44,10 +44,16 @@
 
             <p id="resume-block" class="mt-3">
                 <span class="inline-block mr-4">Resume: </span><span id="resume-name"
-                    data-resume-name="{{ resume_name }}" class="inline-block mr-4">{{ resume_name }}</span><a
-                    id="resume-url" data-resume-url="{{ resume_url }}" class="inline" href="{{ resume_url }}"
+                    data-resume-name="{{ resume_name }}" class="inline-block mr-4">{{ resume_name }}</span>
+                    {% if resume_url %}
+                    <a id="resume-url" data-resume-url="{{ resume_url }}" class="inline" href="{{ resume_url }}"
                     download><img id="pdf-download-img" class="inline h-8" src="{% static 'image/download_pdf.png' %}"
                         alt=""></a>
+                    {% else %}
+                    <a id="resume-url" data-resume-url="{{ resume_url }}" class="inline" href="#">
+                        <img id="pdf-download-img" class="inline h-8" src="{% static 'image/download_pdf.png' %}"
+                        alt=""></a>
+                    {% endif %}
             </p>
 
             <div id="skill-block" class="mt-3">
