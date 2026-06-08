@@ -5,8 +5,14 @@ jobs:
   test_project:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Run DRF unit tests
+    - uses: actions/checkout@v6
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.8'
+    - name: Install dependencies
       run: |
-        pip install --no-cache-dir -r requirements.txt
-        python manage.py test
+        python -m pip install --upgrade pip setuptools wheel
+        pip install -r requirements.txt
+    - name: Run DRF unit tests
+      run: python manage.py test
