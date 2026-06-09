@@ -2,9 +2,12 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from accounts.models import User
 from .models import Job, Location
+from profiles.models import RecruiterProfile
 from allauth.account.admin import EmailAddress
 from rest_framework import status
+from accounts import throttles
 # Create your tests here.
+throttles.apply_monkey_patching_for_test()
 
 class JobTestSetUp(APITestCase):
 
@@ -23,6 +26,7 @@ class JobTestSetUp(APITestCase):
             role=User.RECRUITER,
             password = 'password@123'
         )
+        RecruiterProfile.objects.create(user = cls.recruiter)
 
         cls.recruiter_2 = User.objects.create_user(
             username='shawn',
@@ -288,9 +292,9 @@ class JobTests(JobTestSetUp):
             'created_by': response.data.get('created_by')
         }
         self.assertEqual(response_data,{
-            'salary_min':None,
-            'salary_max': None,
-            'created_by': None
+            'salary_min':20000,
+            'salary_max': 30000,
+            'created_by': self.recruiter.pk
         })
         
         # recruiter attempting to update fields

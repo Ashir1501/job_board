@@ -7,8 +7,10 @@ from jobs.models import Job, Location
 from profiles.models import CandidateProfile
 from .models import Application
 from allauth.account.admin import EmailAddress
+from accounts import throttles
 # Create your tests here.
 
+throttles.apply_monkey_patching_for_test()
 
 class ApplicationTestSetUp(APITestCase):
 

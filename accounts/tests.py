@@ -3,8 +3,9 @@ from rest_framework.test import APITestCase
 from django.urls import reverse
 from rest_framework import status
 from .models import User
+from . import throttles
 # Create your tests here.
-
+throttles.apply_monkey_patching_for_test()
 
 class AccountTests(APITestCase):
     def setUp(self):
