@@ -24,11 +24,27 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
     - name: Create .env file
+      env:
+          ENV_FILE_CONTENT: ${{ secrets.ENV_FILE_CONTENT }}
       run: |
-        cat > .env << EOF
-        ${{ secrets.ENV_FILE_CONTENT }}
-        EOF
-    - name: Verify .env exists
-      run: ls -la
+        echo "$ENV_FILE_CONTENT" > .env
+    - name: Debug env loading
+      run: |
+        python -c "
+        import environ
+        environ.Env.read_env('.env')
+        env = environ.Env()
+        
+        print('DB_NAME:', repr(env('DB_NAME', default='MISSING')))
+        print('DB_USER:', repr(env('DB_USER', default='MISSING')))
+        print('DATABASE_URL:', repr(env('DATABASE_URL', default='MISSING')))
+        "
+    - name: Debug Django database config
+      run: |
+        python manage.py shell -c "
+        from django.conf import settings
+        import pprint
+        pprint.pprint(settings.DATABASES)
+        "
     - name: Run DRF unit tests
       run: python manage.py test
