@@ -16,5 +16,7 @@ jobs:
         pip install -r requirements.txt
     - name: Create .env file
       run: echo "${{ secrets.ENV_FILE_CONTENT }}" > .env
+    - name: Verify file content (Optional)
+      run: cat .env
     - name: Run DRF unit tests
       run: python manage.py test
