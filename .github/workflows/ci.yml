@@ -4,6 +4,15 @@ on: push
 jobs:
   test_project:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
     steps:
     - uses: actions/checkout@v6
     - name: Set up Python
@@ -15,8 +24,11 @@ jobs:
         python -m pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
     - name: Create .env file
-      run: echo "${{ secrets.ENV_FILE_CONTENT }}" > .env
-    - name: Verify file content (Optional)
-      run: cat .env
+      run: |
+        cat > .env << EOF
+        ${{ secrets.ENV_FILE_CONTENT }}
+        EOF
+    - name: Verify .env exists
+      run: ls -la
     - name: Run DRF unit tests
       run: python manage.py test
