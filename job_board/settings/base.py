@@ -258,3 +258,10 @@ CELERY_ACCEPT_CONTENT = ['json'] # celary sends data over network
 CELERY_TASK_SERIALIZER = 'json'  # so serializing it
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": env('REDIS_URL'),
+    }
+}
