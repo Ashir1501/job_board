@@ -9,6 +9,7 @@ from .models import (
 from .service import validate_start_end_date, get_skills
 import filetype
 from django.db import IntegrityError
+from django.core.cache import cache
 import os
 
 class CandidateSerializer(serializers.ModelSerializer):
@@ -89,6 +90,11 @@ class CandidateSerializer(serializers.ModelSerializer):
         instance.updated_by = self.context['request'].user
         try:
             instance.save()
+            user = self.context['request'].user
+            cache_data = cache.get(f'candidate_profile_{user.pk}')
+            if cache_data:
+                cache_data['update'] = True
+                cache.set(f'candidate_profile_{user.pk}',cache_data,None)
             return instance
         except IntegrityError:
             raise serializers.ValidationError({'non_field_errors':['Profile already exists']})
@@ -127,6 +133,11 @@ class WorkExperienceSerializer(serializers.ModelSerializer):
             if skills is not None:
                 skill_objs = get_skills(skills)
                 obj.skills.set(skill_objs)
+
+            cache_data = cache.get(f'candidate_profile_{user.pk}')
+            if cache_data:
+                cache_data['update'] = True
+                cache.set(f'candidate_profile_{user.pk}',cache_data,None)
             return obj
         except IntegrityError:
             raise serializers.ValidationError({'non_field_errors':['Work Experience already exists.']})
@@ -141,6 +152,11 @@ class WorkExperienceSerializer(serializers.ModelSerializer):
             setattr(instance,attr,value)
         try:
             instance.save()
+            user = self.context['request'].user
+            cache_data = cache.get(f'candidate_profile_{user.pk}')
+            if cache_data:
+                cache_data['update'] = True
+                cache.set(f'candidate_profile_{user.pk}',cache_data,None)
             return instance
         except IntegrityError:
             raise serializers.ValidationError({'non_field_errors':['Work Experience already exists.']})
@@ -175,7 +191,11 @@ class ProjectSerializer(serializers.ModelSerializer):
 
         for attr, value in validated_data.items():
             setattr(instance,attr,value)
-
+        user = self.context['request'].user
+        cache_data = cache.get(f'candidate_profile_{user.pk}')
+        if cache_data:
+            cache_data['update'] = True
+            cache.set(f'candidate_profile_{user.pk}',cache_data,None)
         instance.save()
         return instance
     
@@ -188,6 +208,10 @@ class ProjectSerializer(serializers.ModelSerializer):
         if skills is not None:
             skill_objs = get_skills(skills)
             obj.skills.set(skill_objs)
+        cache_data = cache.get(f'candidate_profile_{user.pk}')
+        if cache_data:
+            cache_data['update'] = True
+            cache.set(f'candidate_profile_{user.pk}',cache_data,None)
         return obj
     
 class EducationSerializer(serializers.ModelSerializer):
@@ -217,6 +241,10 @@ class EducationSerializer(serializers.ModelSerializer):
         validated_data['profile'] = user.candidate_profile
         try:
             obj = Education.objects.create(**validated_data)
+            cache_data = cache.get(f'candidate_profile_{user.pk}')
+            if cache_data:
+                cache_data['update'] = True
+                cache.set(f'candidate_profile_{user.pk}',cache_data,None)
             return obj
         except IntegrityError:
             raise serializers.ValidationError({'non_field_errors':['Education already exists.']})
@@ -226,6 +254,11 @@ class EducationSerializer(serializers.ModelSerializer):
             setattr(instance,attr,value)
         try:
             instance.save()
+            user = self.context['request'].user
+            cache_data = cache.get(f'candidate_profile_{user.pk}')
+            if cache_data:
+                cache_data['update'] = True
+                cache.set(f'candidate_profile_{user.pk}',cache_data,None)
             return instance
         except IntegrityError:
             raise serializers.ValidationError({'non_field_errors':['Education already exists.']})
@@ -244,6 +277,10 @@ class RecruiterSerializer(serializers.ModelSerializer):
             setattr(instance,attr,value)
         try:
             instance.save()
+            cache_data = cache.get(f'recruiter_profile_{user.pk}')
+            if cache_data:
+                cache_data['update'] = True
+                cache.set(f'recruiter_profile_{user.pk}',cache_data,None)
             return instance
         except IntegrityError:
             raise serializers.ValidationError({'non_field_errors':['Profile already exists']})

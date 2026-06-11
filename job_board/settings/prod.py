@@ -1,6 +1,6 @@
 from .base import *
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["localhost","job-board-w7a7.onrender.com"]
 
 INSTALLED_APPS += ["anymail"]
 

@@ -15,7 +15,7 @@ from .models import (
     CandidateProfile
 )
 from accounts.permissions import IsCandidate, IsRecruiter
-from drf_spectacular.utils import extend_schema
+from django.core.cache import cache
 
 # Create your views here.
 
@@ -69,6 +69,16 @@ class WorkExpViewSet(viewsets.ModelViewSet):
             return WorkExperience.objects.filter(profile_id=profile_pk)
         return super().get_queryset()
     
+    def destroy(self, request, *args, **kwargs):
+        user = self.request.user
+        
+        cache_data = cache.get(f'candidate_profile_{user.pk}')
+        if cache_data:
+            cache_data['update'] = True
+            cache.set(f'candidate_profile_{user.pk}',cache_data,None)
+        
+        return super().destroy(request, *args, **kwargs)
+    
 class EducationViewSet(viewsets.ModelViewSet):
     queryset = Education.objects.all()
     serializer_class = EducationSerializer
@@ -89,6 +99,16 @@ class EducationViewSet(viewsets.ModelViewSet):
             return Education.objects.filter(profile_id=profile_pk)
         return super().get_queryset()
     
+    def destroy(self, request, *args, **kwargs):
+        user = self.request.user
+
+        cache_data = cache.get(f'candidate_profile_{user.pk}')
+        if cache_data:
+            cache_data['update'] = True
+            cache.set(f'candidate_profile_{user.pk}',cache_data,None)
+        
+        return super().destroy(request, *args, **kwargs)
+    
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
@@ -108,5 +128,15 @@ class ProjectViewSet(viewsets.ModelViewSet):
         if profile_pk:
             return Project.objects.filter(profile_id=profile_pk)
         return super().get_queryset()
+    
+    def destroy(self, request, *args, **kwargs):
+        user = self.request.user
+        
+        cache_data = cache.get(f'candidate_profile_{user.pk}')
+        if cache_data:
+            cache_data['update'] = True
+            cache.set(f'candidate_profile_{user.pk}',cache_data,None)
+        
+        return super().destroy(request, *args, **kwargs)
 
         

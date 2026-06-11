@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from accounts.models import User
 from rest_framework.decorators import api_view, renderer_classes, permission_classes, throttle_classes
 from django.shortcuts import redirect
+from django.core.cache import cache
 from allauth.account.admin import EmailAddress
 from profiles.serializers import WorkExperienceSerializer, ProjectSerializer, EducationSerializer
 from django.views.decorators.cache import never_cache
@@ -58,17 +59,38 @@ def my_jobs_view(request):
 @permission_classes([AllowAny])
 @throttle_classes([])
 def profile_view(request):
+    '''
+    Users Profile Page
+    '''
     if request.user.is_authenticated:
+        user = request.user
+        role = user.role
+
         # email verification data
         is_verified = False 
-        if(EmailAddress.objects.filter(user=request.user).exists()):
-            email_address_instance = EmailAddress.objects.get(user=request.user)
+        if(EmailAddress.objects.filter(user=user).exists()):
+            email_address_instance = EmailAddress.objects.get(user=user)
             is_verified = email_address_instance.verified
 
-        if request.user.role == User.CANDIDATE:
+        # getting data from cache except for is_verified
+        # if there is an update data is taken from DB
+        if role == User.CANDIDATE:
+            context = cache.get(f'candidate_profile_{user.pk}')
+            if context and not context.get('update'):
+                context['is_verified'] = is_verified
+                return Response(context,template_name='profile.html')
+        if role == User.RECRUITER:
+            context = cache.get(f'recruiter_profile_{user.pk}')
+            if context and not context.get('update'):
+                context['is_verified'] = is_verified
+                return Response(context,template_name='recruiter_profile.html')
+            
+
+
+        if role == User.CANDIDATE:
 
             # profile data
-            profile_instance = request.user.candidate_profile
+            profile_instance = user.candidate_profile
             skills_queryset = profile_instance.skills.all()
             resume = profile_instance.resume
             resume_url, resume_name, clean_skill_list = '', '', []
@@ -92,8 +114,8 @@ def profile_view(request):
             education_serializer = EducationSerializer(education_qs, many=True)
 
             context = {
-                'username': request.user.username,
-                'email': request.user.email,
+                'username': user.username,
+                'email': user.email,
                 'is_verified': is_verified,
                 'summary': profile_instance.summary or 'No summary available',
                 'resume_name':resume_name,
@@ -101,24 +123,28 @@ def profile_view(request):
                 'skill_list': clean_skill_list,
                 'work_experiences': work_exp_serializer.data,
                 'projects': projects_serializer.data,
-                'educations': education_serializer.data
+                'educations': education_serializer.data,
+                'update': False
             }
+            cache.set(f'candidate_profile_{user.pk}',context,None)
             return Response(context,template_name='profile.html')
     
-        if request.user.role == User.RECRUITER:
+        if role == User.RECRUITER:
             # profile data
-            profile_instance = request.user.recruiter_profile
+            profile_instance = user.recruiter_profile
             company = profile_instance.company
             website = profile_instance.website
             description = profile_instance.description
             context = {
-                'username': request.user.username,
-                'email': request.user.email,
+                'username': user.username,
+                'email': user.email,
                 'is_verified': is_verified,
                 'company': company or 'Which Company you belong to?', 
                 'website': website or 'Add you Company official Website',
-                'description': description or 'Write a short description'
+                'description': description or 'Write a short description',
+                'update':False
             }
+            cache.set(f'recruiter_profile_{user.pk}',context,None) 
             return Response(context,template_name='recruiter_profile.html')
     return redirect('login')
 
