@@ -51,7 +51,7 @@ jobs:
           DB_HOST: localhost
           DB_PORT: 5432
           SECRET_KEY: testing_secret_key
-          REDIS_URL: redis://redis:6379/0
+          REDIS_URL: redis://localhost:6379/0
         run: |
           python manage.py migrate
           python manage.py test
