@@ -262,6 +262,6 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": env('REDIS_URL'),
+        "LOCATION": env('REDIS_URL', default='redis_url'),
     }
 }
